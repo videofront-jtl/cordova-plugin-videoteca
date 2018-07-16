@@ -59,6 +59,10 @@
         </config-file>
     </platform>
 
+    <platform name="browser">
+    </platform>
+
+
     <hook src="scripts/process.js" type="after_plugin_add" />
     <hook src="scripts/process.js" type="after_prepare" />
 

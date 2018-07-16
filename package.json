@@ -6,7 +6,8 @@
         "id": "cordova-plugin-videoteca",
         "platforms": [
             "android",
-            "ios"
+            "ios",
+            "browser"
         ]
     },
     "repository": {
