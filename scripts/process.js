@@ -10,10 +10,6 @@ var res = /URL_VIDEOTECA.*?(http.*?) /.exec ( argv );
 if ( res && res[ 1 ] ) {
 
     var URL_VIDEOTECA = res[ 1 ];
-
-    console.log ( "URL_VIDEOTECA 1" );
-    console.log ( URL_VIDEOTECA );
-
     proccessReplace ( URL_VIDEOTECA );
 
 } else {
@@ -21,9 +17,6 @@ if ( res && res[ 1 ] ) {
 
     var URL_VIDEOTECA = getValue ( config, "URL_VIDEOTECA" );
     if ( URL_VIDEOTECA ) {
-        console.log ( "URL_VIDEOTECA 2" );
-        console.log ( URL_VIDEOTECA );
-
         proccessReplace ( URL_VIDEOTECA );
     } else {
         console.log ( "\n\n" );
