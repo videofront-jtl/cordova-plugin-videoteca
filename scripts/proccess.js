@@ -32,15 +32,15 @@ if ( res && res[ 1 ] ) {
 
 function proccessReplace ( URL_VIDEOTECA ) {
     if ( directoryExists ( "platforms/ios" ) ) {
-        replaceUrl ( "platforms/ios/platform_www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
+        replaceUrl ( "platforms/ios/platform_www/plugins/cordova-plugin-videoteca/www/Videoteca.min.js",
             URL_VIDEOTECA );
-        replaceUrl ( "platforms/ios/www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
+        replaceUrl ( "platforms/ios/www/plugins/cordova-plugin-videoteca/www/Videoteca.min.js",
             URL_VIDEOTECA );
     }
     if ( directoryExists ( "platforms/android" ) ) {
-        replaceUrl ( "platforms/android/platform_www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
+        replaceUrl ( "platforms/android/platform_www/plugins/cordova-plugin-videoteca/www/Videoteca.min.js",
             URL_VIDEOTECA );
-        replaceUrl ( "platforms/android/assets/www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
+        replaceUrl ( "platforms/android/assets/www/plugins/cordova-plugin-videoteca/www/Videoteca.min.js",
             URL_VIDEOTECA );
     }
 }

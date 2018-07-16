@@ -63,7 +63,7 @@
     </platform>
 
 
-    <hook src="scripts/process.js" type="after_plugin_add" />
-    <hook src="scripts/process.js" type="after_prepare" />
+    <hook src="scripts/proccess.js" type="after_plugin_add" />
+    <hook src="scripts/proccess.js" type="after_prepare" />
 
 </plugin>
