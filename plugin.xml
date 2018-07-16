@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-videoteca"
+        version="1.0.2">
+
+    <name>videoteca</name>
+
+    <description>
+        Plugin adiciona funcionalidade dos vídeos da Videoteca no seu app Cordova/Ionic/Phonegap
+    </description>
+    <author>Eduardo Kraus</author>
+    <repo>https://github.com/videofront/cordova-plugin-videoteca.git</repo>
+    <issue>https://github.com/videofront/cordova-plugin-videoteca/issues</issue>
+
+    <engines>
+        <engine name="cordova" version=">=4.0.0" />
+    </engines>
+
+    <dependency id="cordova-plugin-file"/>
+    <dependency id="cordova-plugin-file-transfer"/>
+
+    <js-module src="www/Videoteca.js" name="CordovaVideoteca">
+        <clobbers target="CordovaVideoteca" />
+    </js-module>
+    
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Videoteca">
+                <param name="ios-package" value="Videoteca" />
+            </feature>
+        </config-file>
+        <config-file target="*-Info.plist" parent="UIBackgroundModes">
+            <array>
+                <string>audio</string>
+                <string>fetch</string>
+            </array>
+        </config-file>
+        <header-file src="src/ios/Videoteca.h" />
+        <source-file src="src/ios/Videoteca.m" />
+        <header-file src="src/ios/LandscapeVideo.h" />
+        <source-file src="src/ios/LandscapeVideo.m" />
+        <header-file src="src/ios/PortraitVideo.h" />
+        <source-file src="src/ios/PortraitVideo.m" />
+        <framework src="MediaPlayer.framework" />
+    </platform>
+
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="Videoteca" >
+                <param name="android-package" value="com.eduardokraus.videoteca.Videoteca"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/Videoteca.java" target-dir="src/com/eduardokraus/videoteca" />
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.WAKE_LOCK" />
+        </config-file>
+    </platform>
+
+    <hook src="scripts/process.js" type="after_plugin_add" />
+    <hook src="scripts/process.js" type="after_prepare" />
+
+</plugin>

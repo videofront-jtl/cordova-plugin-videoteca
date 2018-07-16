@@ -1,0 +1,17 @@
+{
+    "name": "cordova-plugin-videoteca",
+    "version": "1.0.2",
+    "description": "Cordova Videoteca Plugin",
+    "cordova": {
+        "id": "cordova-plugin-videoteca",
+        "platforms": [
+            "android",
+            "ios"
+        ]
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/videofront/cordova-plugin-videoteca"
+    },
+    "engines": []
+}
