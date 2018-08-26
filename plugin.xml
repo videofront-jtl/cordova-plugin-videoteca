@@ -2,9 +2,9 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-videoteca"
-        version="1.0.2">
+        version="1.1.0">
 
-    <name>videoteca</name>
+    <name>cordova-plugin-videoteca</name>
 
     <description>
         Plugin adiciona funcionalidade dos vídeos da Videoteca no seu app Cordova/Ionic/Phonegap
@@ -17,11 +17,14 @@
         <engine name="cordova" version=">=4.0.0" />
     </engines>
 
-    <dependency id="cordova-plugin-file"/>
-    <dependency id="cordova-plugin-file-transfer"/>
+    <dependency id="cordova-plugin-file" />
+    <dependency id="cordova-plugin-file-transfer" />
 
-    <js-module src="www/Videoteca.min.js" name="CordovaVideoteca">
+    <js-module src="www/Videoteca.js" name="CordovaVideoteca">
         <clobbers target="CordovaVideoteca" />
+    </js-module>
+    <js-module src="www/Background.js" name="CordovaBackground">
+        <clobbers target="CordovaBackground" />
     </js-module>
     
     <platform name="ios">
@@ -29,13 +32,18 @@
             <feature name="Videoteca">
                 <param name="ios-package" value="Videoteca" />
             </feature>
+            <feature name="BackgroundMode">
+                <param name="ios-package" value="APPBackgroundMode" onload="true" />
+                <param name="onload" value="true" />
+            </feature>
         </config-file>
+
         <config-file target="*-Info.plist" parent="UIBackgroundModes">
             <array>
-                <string>audio</string>
                 <string>fetch</string>
             </array>
         </config-file>
+
         <header-file src="src/ios/Videoteca.h" />
         <source-file src="src/ios/Videoteca.m" />
         <header-file src="src/ios/LandscapeVideo.h" />
@@ -43,16 +51,41 @@
         <header-file src="src/ios/PortraitVideo.h" />
         <source-file src="src/ios/PortraitVideo.m" />
         <framework src="MediaPlayer.framework" />
+
+        <header-file src="src/ios/APPBackgroundMode.h" />
+        <source-file src="src/ios/APPBackgroundMode.m" />
+        <header-file src="src/ios/APPMethodMagic.h" />
+        <source-file src="src/ios/APPMethodMagic.m" />
     </platform>
 
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="Videoteca" >
-                <param name="android-package" value="com.eduardokraus.videoteca.Videoteca"/>
+            <feature name="Videoteca">
+                <param name="android-package" value="com.eduardokraus.videoteca.Videoteca" />
+            </feature>
+            <feature name="BackgroundMode">
+                <param name="android-package"
+                       value="com.eduardokraus.videoteca.BackgroundMode" />
             </feature>
         </config-file>
 
+        <config-file target="res/xml/config.xml" parent="/*">
+            <preference name="KeepRunning" value="true" />
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <service android:name="com.eduardokraus.videoteca.ForegroundService" />
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.WAKE_LOCK" />
+        </config-file>
+
         <source-file src="src/android/Videoteca.java" target-dir="src/com/eduardokraus/videoteca" />
+
+        <source-file src="src/android/BackgroundMode.java" target-dir="src/com/eduardokraus/videoteca" />
+        <source-file src="src/android/BackgroundExt.java" target-dir="src/com/eduardokraus/videoteca" />
+        <source-file src="src/android/ForegroundService.java" target-dir="src/com/eduardokraus/videoteca" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.WAKE_LOCK" />
