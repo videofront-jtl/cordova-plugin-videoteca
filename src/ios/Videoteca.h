@@ -8,5 +8,6 @@
 
 - (void)playVideo:(CDVInvokedUrlCommand*)command;
 - (void)playAudio:(CDVInvokedUrlCommand*)command;
+- (void)appdata:(CDVInvokedUrlCommand*)command;
 
 @end

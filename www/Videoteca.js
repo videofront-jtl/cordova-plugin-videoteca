@@ -10,19 +10,39 @@ var CordovaVideoteca = {
     _backbuttonEvent : null,
 
     offlineList     : function () {
-        return vfplayer.offlineList ();
+        if ( "object" == typeof VfPlayerOffline ) {
+            return VfPlayerOffline.offlineList ();
+        } else {
+            return false
+        }
     },
     offlineCount    : function () {
-        return vfplayer.offlineCount ();
+        if ( "object" == typeof VfPlayerOffline ) {
+            return VfPlayerOffline.offlineCount ();
+        } else {
+            return false
+        }
     },
-    offlineDownload : function ( identifier, aluno ) {
-        return vfplayer.offlineDownload ( identifier, aluno );
+    offlineDownload : function ( identifier, aluno, extra ) {
+        if ( "object" == typeof VfPlayerOffline ) {
+            return VfPlayerOffline.offlineDownload ( identifier, aluno, extra );
+        } else {
+            return false
+        }
     },
     offlineDelete   : function ( identifier ) {
-        return vfplayer.offlineDelete ( identifier );
+        if ( "object" == typeof VfPlayerOffline ) {
+            return VfPlayerOffline.offlineDelete ( identifier );
+        } else {
+            return false
+        }
     },
-    offlineExist    : function ( identifier, returnFunction ) {
-        return vfplayer.offlineExist ( identifier, returnFunction );
+    offlineExist    : function ( identifier ) {
+        if ( "object" == typeof VfPlayerOffline ) {
+            return VfPlayerOffline.offlineExist ( identifier );
+        } else {
+            return false
+        }
     },
 
     playVideo : function ( identifier, options ) {
@@ -52,11 +72,18 @@ var CordovaVideoteca = {
             options.successCallback = options.successCallback || null;
             options.errorCallback   = options.errorCallback || null;
 
-            exec ( options.successCallback, options.errorCallback, "Videoteca", "playVideo", [ url, options ] );
+            var player = vfplayer ( null, {
+                identifier : identifier,
+                aluno      : options.aluno
+            } );
+            player.loadSource ( function ( url ) {
+                exec ( options.successCallback, options.errorCallback, "Videoteca", "playVideo", [ url, options ] );
+            }, options.errorCallback )
         } else {
             alert ( "Não há suporte para " + cordova.platformId );
         }
     },
+
     stopVideo : function ( event ) {
         if ( cordova.platformId == "android" || cordova.platformId == "browser" ) {
 
@@ -76,7 +103,6 @@ var CordovaVideoteca = {
         }
     },
 
-
     fullscreenOn  : function ( successCallback, errorCallback ) {
         if ( cordova.platformId == "android" ) {
             exec ( successCallback, errorCallback, 'Videoteca', 'fullscreenOn', [] );
@@ -94,28 +120,95 @@ var CordovaVideoteca = {
             return;
 
         if ( CordovaVideoteca.url_videoteca.indexOf ( "https" ) === -1 ) {
-            alert ( "Parece que não configurou direito! \nEntre em contato com suporte!" );
+            alert ( "Parece que não configurou o Plugin cordova-plugin-videoteca!\nVerifique ou Entre em contato com suporte!" );
+            return;
         }
 
-        var videotecaJs = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.js";
-
-        var script     = document.createElement ( 'script' );
-        script.async   = 1;
-        script.src     = videotecaJs;
-        script.onerror = CordovaVideoteca._loadError;
-        document.head.appendChild ( script );
-
-
-        var videotecaCss = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.css";
-
-        var link     = document.createElement ( 'link' );
-        link.async   = 1;
-        link.rel     = "stylesheet";
-        link.href    = videotecaCss;
-        link.onerror = CordovaVideoteca._loadError;
-        document.head.appendChild ( link );
+        exec ( CordovaVideoteca.init_load, CordovaVideoteca.init_load, 'Videoteca', 'appdata', [] );
 
         CordovaVideoteca.hasStarted = true;
+    },
+
+    init_load : function ( appdata ) {
+        console.log ( appdata );
+
+        appdata               = appdata || {};
+        appdata.appName       = appdata.appName || '';
+        appdata.packageName   = appdata.packageName || '';
+        appdata.versionNumber = appdata.versionNumber || '';
+
+        console.log ( appdata );
+
+        var last =
+                "platformId=" + cordova.platformId + "&" +
+
+                "appName=" + appdata.appName + "&" +
+                "appPackageName=" + appdata.appPackageName + "&" +
+                "appVersionNumber=" + appdata.appVersionNumber + "&" +
+
+                "platformUUID=" + appdata.platformUUID + "&" +
+                "platformVersion=" + appdata.platformVersion + "&" +
+                "platformName=" + appdata.platformName + "&" +
+                "platformModel=" + appdata.platformModel + "&" +
+                "platformManufacturer=" + appdata.platformManufacturer + "&" +
+                "platformIsVirtual=" + appdata.platformIsVirtual;
+
+        var videotecaJs  = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.js?" + last;
+        var videotecaCss = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.css?" + last;
+
+
+        var fileTransfer1 = new FileTransfer ();
+        var fileURL1      = "cdvfile://localhost/persistent/videoapp.js";
+        fileTransfer1.download (
+            encodeURI ( videotecaJs ),
+            fileURL1,
+            function ( entry ) {
+                console.log ( "download complete: " + entry.toURL () );
+
+                CordovaVideoteca.addFilePlayer ( fileURL1 );
+            },
+            function ( error ) {
+                console.log ( error );
+
+                CordovaVideoteca.addFilePlayer ( fileURL1 );
+            }
+        );
+
+        var fileTransfer2 = new FileTransfer ();
+        var fileURL2      = "cdvfile://localhost/persistent/videoapp.css";
+        fileTransfer2.download (
+            encodeURI ( videotecaCss ),
+            fileURL2,
+            function ( entry ) {
+                console.log ( "download complete: " + entry.toURL () );
+
+                CordovaVideoteca.addFilePlayer ( fileURL2 );
+            },
+            function ( error ) {
+                console.log ( error );
+
+                CordovaVideoteca.addFilePlayer ( fileURL2 );
+            }
+        );
+    },
+
+    addFilePlayer : function ( fileURL ) {
+        if ( fileURL.indexOf ( '.css' ) > 1 ) {
+            var link     = document.createElement ( 'link' );
+            link.async   = 1;
+            link.rel     = "stylesheet";
+            link.href    = fileURL;
+            link.onerror = CordovaVideoteca._loadError;
+            document.head.appendChild ( link );
+        } else {
+            var script     = document.createElement ( 'script' );
+            script.async   = 1;
+            script.src     = fileURL;
+            script.onerror = CordovaVideoteca._loadError;
+            document.head.appendChild ( script );
+        }
+
+        console.log ( fileURL );
     },
 
     _loadError : function () {
