@@ -12,7 +12,7 @@ var CordovaBackground = {
 
         this._isEnabled = true;
 
-        exec ( null, null, 'BackgroundMode', 'enable', [] );
+        exec ( CordovaBackground._status, CordovaBackground._status, 'BackgroundMode', 'enable', [] );
     },
 
     disable : function () {
@@ -21,7 +21,11 @@ var CordovaBackground = {
 
         this._isEnabled = false;
 
-        exec ( null, null, 'BackgroundMode', 'disable', [] );
+        exec ( CordovaBackground._status, CordovaBackground._status, 'BackgroundMode', 'disable', [] );
+    },
+
+    _status : function ( status ) {
+        console.log ( status );
     }
 };
 

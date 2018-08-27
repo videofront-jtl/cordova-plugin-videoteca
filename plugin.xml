@@ -19,6 +19,7 @@
 
     <dependency id="cordova-plugin-file" />
     <dependency id="cordova-plugin-file-transfer" />
+    <dependency id="cordova-plugin-device" />
 
     <js-module src="www/Videoteca.js" name="CordovaVideoteca">
         <clobbers target="CordovaVideoteca" />
@@ -64,8 +65,7 @@
                 <param name="android-package" value="com.eduardokraus.videoteca.Videoteca" />
             </feature>
             <feature name="BackgroundMode">
-                <param name="android-package"
-                       value="com.eduardokraus.videoteca.BackgroundMode" />
+                <param name="android-package" value="com.eduardokraus.videoteca.BackgroundMode" />
             </feature>
         </config-file>
 
@@ -84,7 +84,6 @@
         <source-file src="src/android/Videoteca.java" target-dir="src/com/eduardokraus/videoteca" />
 
         <source-file src="src/android/BackgroundMode.java" target-dir="src/com/eduardokraus/videoteca" />
-        <source-file src="src/android/BackgroundExt.java" target-dir="src/com/eduardokraus/videoteca" />
         <source-file src="src/android/ForegroundService.java" target-dir="src/com/eduardokraus/videoteca" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
