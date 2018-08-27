@@ -43,6 +43,10 @@ function proccessReplace ( URL_VIDEOTECA ) {
         replaceUrl ( "platforms/android/assets/www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
             URL_VIDEOTECA );
     }
+    if ( directoryExists ( "platforms/browser" ) ) {
+        replaceUrl ( "platforms/browser/www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
+            URL_VIDEOTECA );
+    }
 }
 
 function getValue ( config, name ) {
