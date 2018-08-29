@@ -9,39 +9,47 @@ var CordovaVideoteca = {
     _playerElement   : null,
     _backbuttonEvent : null,
 
+    offlineStatus     : function () {
+        if ( "object" == typeof VfPlayerOffline ) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+
     offlineList     : function () {
         if ( "object" == typeof VfPlayerOffline ) {
             return VfPlayerOffline.offlineList ();
         } else {
-            return false
+            return {};
         }
     },
     offlineCount    : function () {
         if ( "object" == typeof VfPlayerOffline ) {
             return VfPlayerOffline.offlineCount ();
         } else {
-            return false
+            return -1;
         }
     },
     offlineDownload : function ( identifier, aluno, extra ) {
         if ( "object" == typeof VfPlayerOffline ) {
             return VfPlayerOffline.offlineDownload ( identifier, aluno, extra );
         } else {
-            return false
+            return false;
         }
     },
     offlineDelete   : function ( identifier ) {
         if ( "object" == typeof VfPlayerOffline ) {
             return VfPlayerOffline.offlineDelete ( identifier );
         } else {
-            return false
+            return false;
         }
     },
     offlineExist    : function ( identifier ) {
         if ( "object" == typeof VfPlayerOffline ) {
             return VfPlayerOffline.offlineExist ( identifier );
         } else {
-            return false
+            return false;
         }
     },
 
