@@ -31,7 +31,6 @@
 }
 
 NSString * const TYPE_VIDEO = @"VIDEO";
-NSString * const TYPE_AUDIO = @"AUDIO";
 NSString * const DEFAULT_IMAGE_SCALE = @"center";
 
 -(void)parseOptions:(NSDictionary *)options type:(NSString *) type {
@@ -54,37 +53,15 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
     } else {
         initFullscreen = YES;
     }
-
-    if ([type isEqualToString:TYPE_AUDIO]) {
-        videoType = TYPE_AUDIO;
-
-        // bgImage
-        // bgImageScale
-        if (![options isKindOfClass:[NSNull class]] && [options objectForKey:@"bgImage"]) {
-            NSString *imageScale = DEFAULT_IMAGE_SCALE;
-            if (![options isKindOfClass:[NSNull class]] && [options objectForKey:@"bgImageScale"]) {
-                imageScale = [options objectForKey:@"bgImageScale"];
-            }
-            [self setImage:[options objectForKey:@"bgImage"] withScaleType:imageScale];
-        }
-        // bgColor
-        if (![options isKindOfClass:[NSNull class]] && [options objectForKey:@"bgColor"]) {
-            NSLog(@"Found option for bgColor");
-            [self setBackgroundColor:[options objectForKey:@"bgColor"]];
-        } else {
-            backgroundColor = [UIColor blackColor];
-        }
-    }
-    // No specific options for video yet
 }
 
--(void)play:(CDVInvokedUrlCommand *) command type:(NSString *) type {
-    callbackId = command.callbackId;
-    NSString *mediaUrl  = [command.arguments objectAtIndex:0];
-    [self parseOptions:[command.arguments objectAtIndex:1] type:type];
-
-    [self startPlayer:mediaUrl];
-}
+//-(void)play:(CDVInvokedUrlCommand *) command type:(NSString *) type {
+//    // callbackId = command.callbackId;
+//    NSString *mediaUrl  = [command.arguments objectAtIndex:0];
+//    // [self parseOptions:[command.arguments objectAtIndex:1] type:type];
+//
+//    [self startPlayer:mediaUrl];
+//}
 
 -(void)stop:(CDVInvokedUrlCommand *) command type:(NSString *) type {
     callbackId = command.callbackId;
@@ -96,15 +73,60 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
 -(void)playVideo:(CDVInvokedUrlCommand *) command {
     AVAudioSession *session = [AVAudioSession sharedInstance];
     [session setCategory:AVAudioSessionCategoryPlayback error:nil];
-    [self play:command type:[NSString stringWithString:TYPE_VIDEO]];
+    // [self play:command type:[NSString stringWithString:TYPE_VIDEO]];
+
+    callbackId = command.callbackId;
+    [self parseOptions:[command.arguments objectAtIndex:1] type:TYPE_VIDEO];
+    NSString *mediaUrl  = [command.arguments objectAtIndex:0];
+    [self startPlayer:mediaUrl];
 }
 
--(void)playAudio:(CDVInvokedUrlCommand *) command {
-    [self play:command type:[NSString stringWithString:TYPE_AUDIO]];
+-(void)stopVideo:(CDVInvokedUrlCommand *) command {
+    [self stop:command type:[NSString stringWithString:TYPE_VIDEO]];
 }
 
--(void)stopAudio:(CDVInvokedUrlCommand *) command {
-    [self stop:command type:[NSString stringWithString:TYPE_AUDIO]];
+-(void)seekTo:(CDVInvokedUrlCommand *) command {
+    callbackId = command.callbackId;
+
+    if (moviePlayer.player) {
+        [moviePlayer.player pause];
+
+        double seconds =[[command.arguments objectAtIndex:0] doubleValue];
+        CMTime seekTime = CMTimeMakeWithSeconds( seconds, NSEC_PER_SEC );
+
+        [moviePlayer.player seekToTime: seekTime];
+        [moviePlayer.player play];
+    }
+}
+
+- (void)setRate:(CDVInvokedUrlCommand*)command {
+    callbackId = command.callbackId;
+
+    NSNumber* rate = [command argumentAtIndex:0 withDefault:[NSNumber numberWithFloat:1.0]];
+
+    if (moviePlayer.player) {
+        moviePlayer.player.rate = [rate floatValue];
+    }
+}
+
+- (void)getCurrentPositionAudio:(CDVInvokedUrlCommand*)command {
+    double position = -1;
+    double duration = -1;
+
+    if (moviePlayer.player) {
+        CMTime time = [moviePlayer.player currentTime];
+        position = CMTimeGetSeconds(time);
+
+        CMTime time2 = [moviePlayer.player.currentItem.asset duration];
+        duration = CMTimeGetSeconds(time2);
+    }
+
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{
+            @"duration" : @(duration),
+            @"position" : @(position)
+        }];
+
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 -(void)appdata:(CDVInvokedUrlCommand *) command {
@@ -114,8 +136,7 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (NSDictionary*)deviceProperties
-{
+- (NSDictionary*)deviceProperties {
     UIDevice* device = [UIDevice currentDevice];
 
     return @{
@@ -129,7 +150,7 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
              @"platformModel"        : [self modelVersion],
              @"platformManufacturer" : @"Apple",
              @"platformIsVirtual"    : @([self isVirtual])
-         };
+             };
 }
 
 - (NSString*)getAppName {
@@ -176,13 +197,13 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
     return app_uuid;
 }
 - (BOOL)isVirtual {
-    #if TARGET_OS_SIMULATOR
-        return true;
-    #elif TARGET_IPHONE_SIMULATOR
-        return true;
-    #else
-        return false;
-    #endif
+#if TARGET_OS_SIMULATOR
+    return true;
+#elif TARGET_IPHONE_SIMULATOR
+    return true;
+#else
+    return false;
+#endif
 }
 
 
@@ -248,25 +269,25 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
     if ([imageScaleType isEqualToString:@"stretch"]){
         // Stretches image to fill all available background space, disregarding aspect ratio
         imageView.contentMode = UIViewContentModeScaleToFill;
-        
+
     } else if ([imageScaleType isEqualToString:@"fit"]) {
         // fits entire image perfectly
         imageView.contentMode = UIViewContentModeScaleAspectFit;
     } else if ([imageScaleType isEqualToString:@"aspectStretch"]) {
         // Stretches image to fill all possible space while retaining aspect ratio
         imageView.contentMode = UIViewContentModeScaleAspectFill;
-        
+
     } else {
         // Places image in the center of the screen
         imageView.contentMode = UIViewContentModeCenter;
         //moviePlayer.backgroundView.contentMode = UIViewContentModeCenter;
     }
-    
+
     [imageView setImage:[self getImage:imagePath]];
 }
 
 -(void)startPlayer:(NSString*)uri {
-    
+
     NSURL *url             =  [NSURL URLWithString:uri];
     AVPlayer *movie        =  [AVPlayer playerWithURL:url];
     if ([mOrientation isEqualToString:@"landscape"]) {
@@ -276,53 +297,44 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
     } else {
         moviePlayer            =  [[AVPlayerViewController alloc] init];
     }
-    
+
     [moviePlayer setPlayer:movie];
     [moviePlayer setShowsPlaybackControls:YES];
     if(@available(iOS 11.0, *)) { [moviePlayer setEntersFullScreenWhenPlaybackBegins:YES]; }
-    
+
     //present modally so we get a close button
     [self.viewController presentViewController:moviePlayer animated:YES completion:^(void){
         //let's start this bitch.
         [moviePlayer.player play];
     }];
-    
+
     // Listen for playback finishing
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(moviePlayBackDidFinish:)
                                                  name:AVPlayerItemDidPlayToEndTimeNotification
                                                object:moviePlayer.player.currentItem];
-    
+
     // Listen for errors
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(moviePlayBackDidFinish:)
                                                  name:AVPlayerItemFailedToPlayToEndTimeNotification
                                                object:moviePlayer.player.currentItem];
-    
-    if ([videoType isEqualToString:TYPE_AUDIO]) {
-        if (imageView != nil) {
-            [moviePlayer.contentOverlayView setAutoresizesSubviews:YES];
-            [moviePlayer.contentOverlayView addSubview:imageView];
-        }
-        moviePlayer.contentOverlayView.backgroundColor = backgroundColor;
-        [self.viewController.view addSubview:moviePlayer.view];
-    }
-    
+
     // Listen for click on the "Done" button
-    
+
     // Deprecated.. AVPlayerController doesn't offer a "Done" listener... thanks apple. We'll listen for an error when playback finishes
     //    [[NSNotificationCenter defaultCenter] addObserver:self
     //                                             selector:@selector(doneButtonClick:)
     //                                                 name:MPMoviePlayerWillExitFullscreenNotification
     //                                               object:nil];
-    
+
     // Listen for orientation change
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(orientationChanged:)
                                                  name:UIDeviceOrientationDidChangeNotification
                                                object:nil];
-    
-    
+
+
 }
 
 - (void) moviePlayBackDidFinish:(NSNotification*)notification {
@@ -339,7 +351,7 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
         }
         NSLog(@"Playback failed: %@", errorMsg);
     }
-    
+
     if (shouldAutoClose || [errorMsg length] != 0) {
         [self cleanup];
         CDVPluginResult* pluginResult;
@@ -358,22 +370,22 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
     imageView = nil;
     initFullscreen = false;
     backgroundColor = nil;
-    
+
     // Remove playback finished listener
     [[NSNotificationCenter defaultCenter]
-     removeObserver:self
-     name:AVPlayerItemDidPlayToEndTimeNotification
-     object:moviePlayer.player.currentItem];
+        removeObserver:self
+        name:AVPlayerItemDidPlayToEndTimeNotification
+        object:moviePlayer.player.currentItem];
     // Remove playback finished error listener
     [[NSNotificationCenter defaultCenter]
-     removeObserver:self
-     name:AVPlayerItemFailedToPlayToEndTimeNotification
-     object:moviePlayer.player.currentItem];
+        removeObserver:self
+        name:AVPlayerItemFailedToPlayToEndTimeNotification
+        object:moviePlayer.player.currentItem];
     // Remove orientation change listener
     [[NSNotificationCenter defaultCenter]
-     removeObserver:self
-     name:UIDeviceOrientationDidChangeNotification
-     object:nil];
+        removeObserver:self
+        name:UIDeviceOrientationDidChangeNotification
+        object:nil];
     
     if (moviePlayer) {
         [moviePlayer.player pause];

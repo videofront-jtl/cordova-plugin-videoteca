@@ -19,7 +19,7 @@
 
     <dependency id="cordova-plugin-file" />
     <dependency id="cordova-plugin-file-transfer" />
-    <dependency id="cordova-plugin-device" />
+    <dependency id="cordova-plugin-dialogs" />
 
     <js-module src="www/Videoteca.js" name="CordovaVideoteca">
         <clobbers target="CordovaVideoteca" />
@@ -60,12 +60,19 @@
     </platform>
 
     <platform name="android">
+
+        <framework src="com.google.android.exoplayer:exoplayer:r2.2.0"/>
+        <framework src="com.squareup.picasso:picasso:2.5.2"/>
+
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="Videoteca">
                 <param name="android-package" value="com.eduardokraus.videoteca.Videoteca" />
             </feature>
             <feature name="BackgroundMode">
                 <param name="android-package" value="com.eduardokraus.videoteca.BackgroundMode" />
+            </feature>
+            <feature name="ExoPlayer">
+                <param name="android-package" value="com.eduardokraus.videoteca.exoplayer.Plugin"/>
             </feature>
         </config-file>
 
@@ -81,19 +88,36 @@
             <uses-permission android:name="android.permission.WAKE_LOCK" />
         </config-file>
 
+        <!-- Videoteca -->
         <source-file src="src/android/Videoteca.java" target-dir="src/com/eduardokraus/videoteca" />
 
-        <source-file src="src/android/BackgroundMode.java" target-dir="src/com/eduardokraus/videoteca" />
+        <!-- BackgroundMode -->
+        <source-file src="src/android/BackgroundMode.java"    target-dir="src/com/eduardokraus/videoteca" />
         <source-file src="src/android/ForegroundService.java" target-dir="src/com/eduardokraus/videoteca" />
 
-        <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-permission android:name="android.permission.WAKE_LOCK" />
-        </config-file>
-    </platform>
+        <!-- ExoPlayer -->
+        <source-file src="src/res/layout/exo_simple_player_view.xml"    target-dir="res/layout/"/>
+        <source-file src="src/res/layout/exo_playback_control_view.xml" target-dir="res/layout/"/>
 
-    <platform name="browser">
-    </platform>
+        <source-file src="src/android/player/CallbackResponse.java"     target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
+        <source-file src="src/android/player/Configuration.java"        target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
+        <source-file src="src/android/player/LayoutProvider.java"       target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
+        <source-file src="src/android/player/Payload.java"              target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
+        <source-file src="src/android/player/Player.java"               target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
+        <source-file src="src/android/player/Plugin.java"               target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
+        <source-file src="src/android/player/SpeedActivity.java"        target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
 
+        <resource-file src="src/res/icons/drawable-hdpi/exoplayer_back.png" target="res/drawable-hdpi/exoplayer_back.png" />
+        <resource-file src="src/res/icons/drawable-mdpi/exoplayer_back.png" target="res/drawable-mdpi/exoplayer_back.png" />
+        <resource-file src="src/res/icons/drawable-xhdpi/exoplayer_back.png" target="res/drawable-xhdpi/exoplayer_back.png" />
+        <resource-file src="src/res/icons/drawable-xxhdpi/exoplayer_back.png" target="res/drawable-xxhdpi/exoplayer_back.png" />
+
+        <resource-file src="src/res/icons/drawable-hdpi/exoplayer_forward.png" target="res/drawable-hdpi/exoplayer_forward.png" />
+        <resource-file src="src/res/icons/drawable-mdpi/exoplayer_forward.png" target="res/drawable-mdpi/exoplayer_forward.png" />
+        <resource-file src="src/res/icons/drawable-xhdpi/exoplayer_forward.png" target="res/drawable-xhdpi/exoplayer_forward.png" />
+        <resource-file src="src/res/icons/drawable-xxhdpi/exoplayer_forward.png" target="res/drawable-xxhdpi/exoplayer_forward.png" />
+
+    </platform>
 
     <hook src="scripts/process.js" type="after_plugin_add" />
     <hook src="scripts/process.js" type="after_prepare" />
