@@ -53,7 +53,7 @@ var CordovaVideoteca = {
         }
     },
 
-    playVideo : function ( identifier, options ) {
+    playVideo : function ( identifier, aluno_id, options ) {
 
         options                 = options || {};
         options.autoplay        = options.autoplay || true;
@@ -64,7 +64,8 @@ var CordovaVideoteca = {
 
         var player = vfplayer ( null, {
             identifier : identifier,
-            aluno      : options.aluno
+            aluno      : options.aluno,
+            aluno_id   : aluno_id
         } );
 
         if ( cordova.platformId == "android" ) {

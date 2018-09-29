@@ -22,7 +22,8 @@ cordova plugin add https://github.com/videofront/cordova-plugin-videoteca/ --var
 ## Uso Simples
 
 ```javascript
-CordovaVideoteca.playVideo ( 'ID_VIDEO_NA_VIDEOTECA' );
+var aluno_id = 123456;
+CordovaVideoteca.playVideo ( 'VIDEO_IDENTIFIER_DA_VIDEOTECA', aluno_id );
 ```
 
 ## Opções avaçadas
@@ -40,8 +41,10 @@ var options = {
     successCallback : function () {
     },
     errorCallback   : function ( errMsg ) {
+        console.log( errMsg );
     },
-    orientation     : 'landscape' // apenas IOS
+    orientation     : 'landscape' // usado apenas no IOS
 };
-CordovaVideoteca.playVideo ( 'ID_VIDEO_NA_VIDEOTECA', options );
+var aluno_id = 123456;
+CordovaVideoteca.playVideo ( 'VIDEO_IDENTIFIER_DA_VIDEOTECA', aluno_id, options );
 ```
