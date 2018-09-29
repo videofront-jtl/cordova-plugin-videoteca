@@ -337,7 +337,7 @@ public class Player {
     public long getCurrentPosition() {
         if (exoPlayer == null)
             return -1;
-        return exoPlayer.getCurrentPosition();
+        return exoPlayer.getCurrentPosition() / 1000;
     }
 
     public long getDuration() {

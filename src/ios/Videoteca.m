@@ -109,7 +109,7 @@ NSString * const DEFAULT_IMAGE_SCALE = @"center";
     }
 }
 
-- (void)getCurrentPositionAudio:(CDVInvokedUrlCommand*)command {
+- (void)getState:(CDVInvokedUrlCommand*)command {
     double position = -1;
     double duration = -1;
 

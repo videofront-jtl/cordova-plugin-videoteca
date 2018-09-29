@@ -33,8 +33,8 @@ public class Videoteca extends CordovaPlugin {
             return playVideo(args);
         } else if (action.equals("seekTo")) {
             return seekTo(args);
-        } else if (action.equals("getCurrentPosition")) {
-            return getCurrentPosition();
+        } else if (action.equals("getState")) {
+            return getState();
         } else if (action.equals("fullscreenOn")) {
             return fullscreenOn();
         } else if (action.equals("fullscreenOff")) {
@@ -123,13 +123,13 @@ public class Videoteca extends CordovaPlugin {
         }
     }
 
-    private boolean getCurrentPosition() {
+    private boolean getState() {
         if (Plugin.player == null) {
             return false;
         }
         cordova.getActivity().runOnUiThread(new Runnable() {
             public void run() {
-                PluginResult result = new PluginResult(PluginResult.Status.OK, Plugin.player.getCurrentPosition());
+                PluginResult result = new PluginResult(PluginResult.Status.OK, Plugin.player.stateEvent());
                 callbackContext.sendPluginResult(result);
             }
         });

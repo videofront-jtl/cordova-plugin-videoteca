@@ -10,6 +10,8 @@ var CordovaVideoteca = {
     _playerElement   : null,
     _backbuttonEvent : null,
 
+    incrementVideoPlayer_setInterval : null,
+
     offlineStatus   : function () {
         if ( "object" == typeof VfPlayerOffline ) {
             return true;
@@ -62,6 +64,8 @@ var CordovaVideoteca = {
         options.errorCallback   = options.errorCallback || null;
         options.seekTo          = options.seekTo || 0;
 
+        CordovaVideoteca.stopVideo ();
+
         var player = vfplayer ( null, {
             identifier : identifier,
             aluno      : options.aluno,
@@ -85,16 +89,13 @@ var CordovaVideoteca = {
                         console.log ( message );
 
                         /**
-                         * { playback_state: "STATE_IDLE", event_type: "state_changed_event" }
-                         * { event_type: "start_event" }
+                         * { playback_state: "STATE_IDLE",      event_type: "state_changed_event" }
+                         * { playback_state: "STATE_READY",     event_type: "state_changed_event" }
                          * { playback_state: "STATE_BUFFERING", event_type: "state_changed_event" }
-                         * { event_type: "loading_event", loading: "true" }
-                         * { playback_state: "STATE_READY", event_type: "state_changed_event" }
-                         * { playback_state: "STATE_BUFFERING", event_type: "state_changed_event" }
-                         * { playback_state: "STATE_READY", event_type: "state_changed_event" }
-                         * { playback_state: "STATE_ENDED", event_type: "state_changed_event" }
-                         * { error_message: null, error_type: "source", event_type: "player_error_event" }
-                         * { event_type: "stop_event" }
+                         * { playback_state: "STATE_ENDED",     event_type: "state_changed_event" }
+                         * {                                    event_type: "start_event" }
+                         * {                                    event_type: "loading_event", loading: "true" }
+                         * {                                    event_type: "stop_event" }
                          */
                         if ( message.event_type == "state_changed_event" ) {
                             if ( message.playback_state == "STATE_ENDED" ) {
@@ -134,7 +135,6 @@ var CordovaVideoteca = {
                         }
                     }, "Videoteca", "playVideo", [ parameters ] );
             }, options.errorCallback );
-
         } else if ( cordova.platformId == "ios" ) {
             options.orientation = options.orientation || "landscape";
 
@@ -158,17 +158,44 @@ var CordovaVideoteca = {
 
         } else {
             alert ( "Não há suporte para " + cordova.platformId );
+            return;
         }
+
+        clearInterval ( CordovaVideoteca.incrementVideoPlayer_setInterval );
+        CordovaVideoteca.incrementVideoPlayer_setInterval = setInterval ( function () {
+            if ( player == null )
+                return;
+            CordovaVideoteca.getState ( function ( playerData ) {
+
+                console.log ( playerData );
+
+                var duration    = playerData.duration;
+                var currentTime = playerData.position;
+
+                window.dispatchEvent ( new CustomEvent ( 'videoteca-ontimeupdate', {
+                    'detail' : {
+                        identifier  : identifier,
+                        aluno_id    : aluno_id,
+                        currentTime : currentTime,
+                        duration    : duration,
+                        percentage  : (100 / duration) * currentTime
+                    }
+                } ) );
+
+            }, function ( error ) {
+                console.log ( error );
+            } )
+        }, 250 );
     },
 
     stopVideo : function () {
-        exec ( null, null, "Videoteca", "stopAudio" );
+        exec ( null, null, "Videoteca", "stopVideo" );
+
+        clearInterval ( CordovaVideoteca.incrementVideoPlayer_setInterval );
     },
 
     getState : function ( successCallback, errorCallback ) {
-        if ( cordova.platformId == "android" ) {
-            exec ( successCallback, errorCallback, 'Videoteca', 'getCurrentPosition', [] );
-        }
+        exec ( successCallback, errorCallback, 'Videoteca', 'getState', [] );
     },
 
     hasStarted : false,

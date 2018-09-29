@@ -9,7 +9,7 @@
 - (void)playVideo:(CDVInvokedUrlCommand*)command;
 - (void)stopVideo:(CDVInvokedUrlCommand*)command;
 - (void)seekTo:(CDVInvokedUrlCommand*)command;
-- (void)getCurrentPosition:(CDVInvokedUrlCommand*)command;
+- (void)getState:(CDVInvokedUrlCommand*)command;
 - (void)setRate:(CDVInvokedUrlCommand*)command;
 - (void)appdata:(CDVInvokedUrlCommand*)command;
 

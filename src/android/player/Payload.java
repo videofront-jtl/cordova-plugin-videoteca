@@ -42,9 +42,9 @@ public class Payload {
         Map<String, String> map = new HashMap<String, String>();
         map.put("event_type", "state_event");
         if(player != null) {
-            map.put("playing", Boolean.toString(player.getPlayWhenReady()));
-            map.put("duration", Long.toString(player.getDuration()));
-            map.put("position", Long.toString(player.getCurrentPosition()));
+            map.put("playing",  Boolean.toString(player.getPlayWhenReady()));
+            map.put("duration", Long.toString(player.getDuration()/1000));
+            map.put("position", Long.toString(player.getCurrentPosition()/1000));
         }
         return new JSONObject(map);
     }
@@ -83,8 +83,8 @@ public class Payload {
         map.put("event_type", "position_discontinuity_event");
         if(player != null) {
             map.put("playing", Boolean.toString(player.getPlayWhenReady()));
-            map.put("duration", Long.toString(player.getDuration()));
-            map.put("position", Long.toString(player.getCurrentPosition()));
+            map.put("duration", Long.toString(player.getDuration()/1000));
+            map.put("position", Long.toString(player.getCurrentPosition()/1000));
         }
         return new JSONObject(map);
     }
