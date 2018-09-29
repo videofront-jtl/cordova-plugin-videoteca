@@ -129,7 +129,7 @@ public class Videoteca extends CordovaPlugin {
         }
         cordova.getActivity().runOnUiThread(new Runnable() {
             public void run() {
-                PluginResult result = new PluginResult(PluginResult.Status.OK, Plugin.player.stateEvent());
+                PluginResult result = new PluginResult(PluginResult.Status.OK, Plugin.player.getPlayerState());
                 callbackContext.sendPluginResult(result);
             }
         });

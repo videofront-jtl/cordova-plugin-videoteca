@@ -2,7 +2,9 @@ package com.eduardokraus.videoteca.exoplayer;
 
 import android.view.*;
 import com.google.android.exoplayer2.*;
+
 import java.util.*;
+
 import org.json.*;
 
 public class Payload {
@@ -41,10 +43,10 @@ public class Payload {
     public static JSONObject stateEvent(ExoPlayer player) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("event_type", "state_event");
-        if(player != null) {
+        if (player != null) {
             map.put("playing",  Boolean.toString(player.getPlayWhenReady()));
-            map.put("duration", Long.toString(player.getDuration()/1000));
-            map.put("position", Long.toString(player.getCurrentPosition()/1000));
+            map.put("duration", Long.toString(player.getDuration() / 1000));
+            map.put("position", Long.toString(player.getCurrentPosition() / 1000));
         }
         return new JSONObject(map);
     }
@@ -81,10 +83,10 @@ public class Payload {
     public static JSONObject positionDiscontinuityEvent(ExoPlayer player) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("event_type", "position_discontinuity_event");
-        if(player != null) {
-            map.put("playing", Boolean.toString(player.getPlayWhenReady()));
-            map.put("duration", Long.toString(player.getDuration()/1000));
-            map.put("position", Long.toString(player.getCurrentPosition()/1000));
+        if (player != null) {
+            map.put("playing",  Boolean.toString(player.getPlayWhenReady()));
+            map.put("duration", Long.toString(player.getDuration() / 1000));
+            map.put("position", Long.toString(player.getCurrentPosition() / 1000));
         }
         return new JSONObject(map);
     }
