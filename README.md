@@ -2,12 +2,12 @@
 
 ## Instalação
 
-Lembre-se de alterar ``https://SUAVIDEOTECA.videofront.com.br/`` pela URL da sua Videoteca
+Lembre-se de alterar ``https://SUAVIDEOTECA.videotecaead.com.br/`` pela URL da sua Videoteca
 
 ### Linha de comando
 
 ```
-cordova plugin add https://github.com/videofront/cordova-plugin-videoteca/ --variable URL_VIDEOTECA="https://SUAVIDEOTECA.videofront.com.br/"
+cordova plugin add https://github.com/videofront/cordova-plugin-videoteca/ --variable URL_VIDEOTECA="https://SUAVIDEOTECA.videotecaead.com.br/"
 ```
 
 ### Adicionando no config.xml
@@ -15,7 +15,7 @@ cordova plugin add https://github.com/videofront/cordova-plugin-videoteca/ --var
 ```xml
 <plugin name="cordova-plugin-videoteca"
         spec="https://github.com/videofront/cordova-plugin-videoteca">
-    <param name="URL_VIDEOTECA" value="https://SUAVIDEOTECA.videofront.com.br/" />
+    <param name="URL_VIDEOTECA" value="https://SUAVIDEOTECA.videotecaead.com.br/" />
 </plugin>
 ```
 
