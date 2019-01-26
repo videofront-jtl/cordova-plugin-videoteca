@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-videoteca"
-        version="1.1.0">
+        version="2.1.9">
 
     <name>cordova-plugin-videoteca</name>
 
@@ -20,6 +20,7 @@
     <dependency id="cordova-plugin-file" />
     <dependency id="cordova-plugin-file-transfer" />
     <dependency id="cordova-plugin-dialogs" />
+    <dependency id="cordova-plugin-statusbar" />
 
     <js-module src="www/Videoteca.js" name="CordovaVideoteca">
         <clobbers target="CordovaVideoteca" />
@@ -47,11 +48,11 @@
 
         <header-file src="src/ios/Videoteca.h" />
         <source-file src="src/ios/Videoteca.m" />
-        <header-file src="src/ios/LandscapeVideo.h" />
-        <source-file src="src/ios/LandscapeVideo.m" />
-        <header-file src="src/ios/PortraitVideo.h" />
-        <source-file src="src/ios/PortraitVideo.m" />
-        <framework src="MediaPlayer.framework" />
+        <!--<header-file src="src/ios/LandscapeVideo.h" />-->
+        <!--<source-file src="src/ios/LandscapeVideo.m" />-->
+        <!--<header-file src="src/ios/PortraitVideo.h" />-->
+        <!--<source-file src="src/ios/PortraitVideo.m" />-->
+        <!--<framework src="MediaPlayer.framework" />-->
 
         <header-file src="src/ios/APPBackgroundMode.h" />
         <source-file src="src/ios/APPBackgroundMode.m" />
@@ -70,9 +71,6 @@
             </feature>
             <feature name="BackgroundMode">
                 <param name="android-package" value="com.eduardokraus.videoteca.BackgroundMode" />
-            </feature>
-            <feature name="ExoPlayer">
-                <param name="android-package" value="com.eduardokraus.videoteca.exoplayer.Plugin"/>
             </feature>
         </config-file>
 
@@ -94,28 +92,6 @@
         <!-- BackgroundMode -->
         <source-file src="src/android/BackgroundMode.java"    target-dir="src/com/eduardokraus/videoteca" />
         <source-file src="src/android/ForegroundService.java" target-dir="src/com/eduardokraus/videoteca" />
-
-        <!-- ExoPlayer -->
-        <source-file src="src/res/layout/exo_simple_player_view.xml"    target-dir="res/layout/"/>
-        <source-file src="src/res/layout/exo_playback_control_view.xml" target-dir="res/layout/"/>
-
-        <source-file src="src/android/player/CallbackResponse.java"     target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/Configuration.java"        target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/LayoutProvider.java"       target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/Payload.java"              target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/Player.java"               target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/Plugin.java"               target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/SpeedActivity.java"        target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-
-        <resource-file src="src/res/icons/drawable-hdpi/exoplayer_back.png" target="res/drawable-hdpi/exoplayer_back.png" />
-        <resource-file src="src/res/icons/drawable-mdpi/exoplayer_back.png" target="res/drawable-mdpi/exoplayer_back.png" />
-        <resource-file src="src/res/icons/drawable-xhdpi/exoplayer_back.png" target="res/drawable-xhdpi/exoplayer_back.png" />
-        <resource-file src="src/res/icons/drawable-xxhdpi/exoplayer_back.png" target="res/drawable-xxhdpi/exoplayer_back.png" />
-
-        <resource-file src="src/res/icons/drawable-hdpi/exoplayer_forward.png" target="res/drawable-hdpi/exoplayer_forward.png" />
-        <resource-file src="src/res/icons/drawable-mdpi/exoplayer_forward.png" target="res/drawable-mdpi/exoplayer_forward.png" />
-        <resource-file src="src/res/icons/drawable-xhdpi/exoplayer_forward.png" target="res/drawable-xhdpi/exoplayer_forward.png" />
-        <resource-file src="src/res/icons/drawable-xxhdpi/exoplayer_forward.png" target="res/drawable-xxhdpi/exoplayer_forward.png" />
 
     </platform>
 

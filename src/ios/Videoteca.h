@@ -6,11 +6,8 @@
 @interface Videoteca : CDVPlugin
 @property (nonatomic, strong) AVAudioSession* avSession;
 
-- (void)playVideo:(CDVInvokedUrlCommand*)command;
-- (void)stopVideo:(CDVInvokedUrlCommand*)command;
-- (void)seekTo:(CDVInvokedUrlCommand*)command;
-- (void)getState:(CDVInvokedUrlCommand*)command;
-- (void)setRate:(CDVInvokedUrlCommand*)command;
+- (void)fullscreenOn:(CDVInvokedUrlCommand*)command;
+- (void)fullscreenOff:(CDVInvokedUrlCommand*)command;
 - (void)appdata:(CDVInvokedUrlCommand*)command;
 
 @end

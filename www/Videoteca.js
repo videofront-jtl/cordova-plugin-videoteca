@@ -12,6 +12,8 @@ var CordovaVideoteca = {
 
     incrementVideoPlayer_setInterval : null,
 
+    flow_api : null,
+
     offlineStatus   : function () {
         if ( "object" == typeof VfPlayerOffline ) {
             return true;
@@ -55,6 +57,137 @@ var CordovaVideoteca = {
         }
     },
 
+    playVideo2 : function ( identifier, aluno_id, options ) {
+
+        options                 = options || {};
+        options.autoplay        = options.autoplay || true;
+        options.aluno           = options.aluno || {};
+        options.successCallback = options.successCallback || null;
+        options.errorCallback   = options.errorCallback || null;
+        options.seekTo          = options.seekTo || 0;
+
+        if ( CordovaVideoteca.flow_api != null ) {
+            CordovaVideoteca.flow_api.stop ()
+        }
+
+        var player = vfplayer ( null, {
+            identifier : identifier,
+            aluno      : options.aluno,
+            aluno_id   : aluno_id
+        } );
+
+        if ( !document.getElementById ( "videofront_videoplayer" ) ) {
+            var divVideofront       = document.createElement ( 'div' );
+            divVideofront.id        = "videofront_videoplayer";
+            divVideofront.className = "flowplayer is-closeable";
+            document.body.appendChild ( divVideofront );
+
+            var playerElement = document.getElementById ( "videofront_videoplayer" );
+
+            playerElement.style.position        = "fixed";
+            playerElement.style.top             = 0;
+            playerElement.style.left            = 0;
+            playerElement.style.right           = 0;
+            playerElement.style.bottom          = 0;
+            playerElement.style.zIndex          = 999999;
+            playerElement.style.backgroundColor = "#000000";
+        }
+
+        player.loadSource2 ( function ( videoUrl, subtitle, seekTo, poster ) {
+
+            CordovaBackground.enable ();
+            CordovaVideoteca.fullscreenOn ();
+
+            if ( options.successCallback ) {
+                options.successCallback ();
+            }
+
+            CordovaVideoteca.flow_api = flowplayer ( "#videofront_videoplayer", {
+                chromecast        : true,
+                autoplay          : false,
+                share             : false,
+                //ratio           : "720x480",
+                width             : "100%",
+                height            : "100%",
+                poster            : poster,
+                safety            : "",
+                fullscreen        : false,
+                native_fullscreen : false,
+                errors            : [
+                    "",
+                    "Carregamento de vídeo abortado",
+                    "Erro de rede",
+                    "Vídeo não codificado corretamente",
+                    "Arquivo de vídeo não encontrado",
+                    "Vídeo não suportado",
+                    "Skin não encontrado",
+                    "Arquivo SWF não encontrado",
+                    "Subtítulo não encontrado",
+                    "URL RTMP inválido",
+                    "Formato de vídeo não suportado. Tente instalar o Adobe Flash."
+                ],
+                clip              : {
+                    sources : [ {
+                        type : "application/x-mpegurl",
+                        src  : videoUrl
+                    } ]
+                }
+            } );
+
+            CordovaVideoteca.flow_api.on ( 'ready', function ( e, api ) {
+                api.play ();
+
+                if ( seekTo ) {
+                    api.seekTo ( seekTo );
+                }
+
+                document.getElementsByClassName ( "fp-unload" )[ 0 ].onclick = function () {
+                    document.body.removeChild ( divVideofront );
+                    CordovaBackground.disable ();
+                    CordovaVideoteca.fullscreenOff ();
+                }
+            } );
+
+            CordovaVideoteca.flow_api.on ( 'finish shutdown unload', function ( e, api ) {
+                document.body.removeChild ( divVideofront );
+                CordovaBackground.disable ();
+                CordovaVideoteca.fullscreenOff ();
+            } );
+
+            var loader                = new XMLHttpRequest ();
+            loader.onreadystatechange = function () {
+                if ( this.readyState == 4 && this.status == 200 ) {
+                    CordovaVideoteca.flow_api.video.subtitles = [ {
+                        "default" : true,
+                        kind      : "subtitles",
+                        srclang   : "pt-BR",
+                        label     : "Legenda pt-BR",
+                        src       : subtitle
+                    } ];
+                    CordovaVideoteca.flow_api.loadSubtitles ( 0 );
+                }
+                else if ( this.readyState == 4 && this.status != 200 ) {
+                    var x = document.getElementsByClassName ( "fp-cc" );
+                    if ( x[ 0 ] ) {
+                        x[ 0 ].style.display = 'none';
+                    }
+                }
+            };
+            loader.open ( 'HEAD', subtitle, true );
+            loader.send ();
+
+            if ( 'object' == typeof PlayerAnalytics ) {
+                PlayerAnalytics.startFlow ( CordovaVideoteca.flow_api, identifier, aluno_id );
+            }
+        }, function () {
+            if ( options.errorCallback ) {
+                options.errorCallback ();
+            }
+            CordovaBackground.disable ();
+            CordovaVideoteca.fullscreenOff ();
+        } );
+    },
+
     playVideo : function ( identifier, aluno_id, options ) {
 
         options                 = options || {};
@@ -75,11 +208,11 @@ var CordovaVideoteca = {
         if ( cordova.platformId == "android" ) {
 
             options.aluno.dash = true;
-            player.loadSource2 ( function ( video, subtitle, seekTo ) {
+            player.loadSource2 ( function ( videoUrl, subtitle, seekTo ) {
 
                 var parameters = {
                     user_agent  : "Mozilla/5.0 (Linux; Android " + CordovaVideoteca._appdata.platformVersion + "; AppleWebKit/537.36 (KHTML, like Gecko) " + CordovaVideoteca._appdata.appName + "/" + CordovaVideoteca._appdata.appVersionNumber + " Mobile Safari",
-                    url         : video,
+                    url         : videoUrl,
                     subtitleUrl : subtitle
                 };
 
@@ -135,12 +268,13 @@ var CordovaVideoteca = {
                         }
                     }, "Videoteca", "playVideo", [ parameters ] );
             }, options.errorCallback );
-        } else if ( cordova.platformId == "ios" ) {
+        }
+        else if ( cordova.platformId == "ios" ) {
             options.orientation = options.orientation || "landscape";
 
             var isReady = false;
-            player.loadSource2 ( function ( video, subtitle, seekTo ) {
-                exec ( options.successCallback, options.errorCallback, "Videoteca", "playVideo", [ video, options ] );
+            player.loadSource2 ( function ( videoUrl, subtitle, seekTo ) {
+                exec ( options.successCallback, options.errorCallback, "Videoteca", "playVideo", [ videoUrl, options ] );
 
                 if ( options.successCallback ) {
                     options.successCallback ();
@@ -156,7 +290,8 @@ var CordovaVideoteca = {
 
             }, options.errorCallback );
 
-        } else {
+        }
+        else {
             alert ( "Não há suporte para " + cordova.platformId );
             return;
         }
@@ -235,58 +370,73 @@ var CordovaVideoteca = {
                 "platformManufacturer=" + CordovaVideoteca._appdata.platformManufacturer + "&" +
                 "platformIsVirtual=" + CordovaVideoteca._appdata.platformIsVirtual;
 
-        var videotecaJs  = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.js?" + last;
-        var videotecaCss = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.css?" + last;
 
-        var fileURL1 = "cdvfile://localhost/persistent/videoapp.js";
+        var localVideoteca1   = "cdvfile://localhost/persistent/videoapp.js";
+        var remoteVideotecaJs = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.js?" + last;
+        CordovaVideoteca.downloadAndAdd ( localVideoteca1, remoteVideotecaJs );
+
+        var localVideoteca2    = "cdvfile://localhost/persistent/videoapp.css";
+        var remoteVideotecaCss = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.css?" + last;
+        CordovaVideoteca.downloadAndAdd ( localVideoteca2, remoteVideotecaCss );
+
+        // Arquivos VideofrontPlayer
+        var localPlayer1  = "cdvfile://localhost/persistent/player.css";
+        var remotePlayer1 = CordovaVideoteca.url_videoteca + "vendor-js/player/player.css";
+        CordovaVideoteca.downloadAndAdd ( localPlayer1, remotePlayer1 );
+
+        var localPlayer2  = "cdvfile://localhost/persistent/player-mobile.js";
+        var remotePlayer2 = CordovaVideoteca.url_videoteca + "vendor-js/player/player-mobile.js";
+        CordovaVideoteca.downloadAndAdd ( localPlayer2, remotePlayer2 );
+
+        var localPlayer3  = "cdvfile://localhost/persistent/player-analytics.js";
+        var remotePlayer3 = CordovaVideoteca.url_videoteca + "api/Videos/analytics.js";
+        CordovaVideoteca.downloadAndAdd ( localPlayer3, remotePlayer3 );
+
+        CordovaVideoteca.createNewPath ( "cdvfile://localhost/persistent/", "icons", function () {
+            var localPlayer4  = "cdvfile://localhost/persistent/icons/player.woff2";
+            var remotePlayer4 = CordovaVideoteca.url_videoteca + "vendor-js/player/icons/player.woff2";
+            CordovaVideoteca.downloadAndAdd ( localPlayer4, remotePlayer4 );
+
+            var localPlayer5  = "cdvfile://localhost/persistent/icons/player.woff";
+            var remotePlayer5 = CordovaVideoteca.url_videoteca + "vendor-js/player/icons/player.woff";
+            CordovaVideoteca.downloadAndAdd ( localPlayer5, remotePlayer5 );
+        } );
+    },
+
+    downloadAndAdd : function ( localFile, remoteFile, returnFunction ) {
         CordovaVideoteca._download (
-            encodeURI ( videotecaJs ),
-            fileURL1,
+            encodeURI ( remoteFile ),
+            localFile,
             function ( entry ) {
-                console.log ( "download complete: " + entry.toURL () );
+                CordovaVideoteca.addFilePlayer ( localFile );
 
-                CordovaVideoteca.addFilePlayer ( fileURL1 );
+                if ( returnFunction ) {
+                    returnFunction ();
+                }
             },
             function ( error ) {
                 console.log ( error );
+                CordovaVideoteca.addFilePlayer ( localFile );
 
-                CordovaVideoteca.addFilePlayer ( fileURL1 );
-            }
-        );
-
-        var fileURL2 = "cdvfile://localhost/persistent/videoapp.css";
-        CordovaVideoteca._download (
-            encodeURI ( videotecaCss ),
-            fileURL2,
-            function ( entry ) {
-                console.log ( "download complete: " + entry.toURL () );
-
-                CordovaVideoteca.addFilePlayer ( fileURL2 );
-            },
-            function ( error ) {
-                console.log ( error );
-
-                CordovaVideoteca.addFilePlayer ( fileURL2 );
+                if ( returnFunction ) {
+                    returnFunction ();
+                }
             }
         );
     },
 
     addFilePlayer : function ( fileURL ) {
         if ( fileURL.indexOf ( '.css' ) > 1 ) {
-            var link   = document.createElement ( 'link' );
-            link.async = 1;
-            link.rel   = "stylesheet";
-            link.href  = fileURL;
+            var link  = document.createElement ( 'link' );
+            link.rel  = "stylesheet";
+            link.href = fileURL;
             document.head.appendChild ( link );
-        } else {
+        } else if ( fileURL.indexOf ( '.js' ) > 1 ) {
             var script     = document.createElement ( 'script' );
-            script.async   = 1;
             script.src     = fileURL;
             script.onerror = CordovaVideoteca._loadError;
             document.head.appendChild ( script );
         }
-
-        console.log ( fileURL );
     },
 
     _loadError : function () {
@@ -323,7 +473,6 @@ var CordovaVideoteca = {
         xhr.onload  = function ( e ) {
 
             var fileNotFound  = function () {
-                console.log ( "A2" );
                 fail ( 1 );
             };
             var getParentPath = function ( filePath ) {
@@ -348,12 +497,10 @@ var CordovaVideoteca = {
                                         successCallback ( entry );
                                     }
                                 } else {
-                                    console.log ( "A3" );
                                     fail ( 1 );
                                 }
                             };
                             fileWriter.onerror    = function () {
-                                console.log ( "A1" );
                                 fail ( 1 );
                             };
                             fileWriter.write ( req.response );
@@ -361,10 +508,8 @@ var CordovaVideoteca = {
                     }, fileNotFound );
                 }, fileNotFound );
             } else if ( req.status === 404 ) {
-                console.log ( "A4" );
                 fail ( 2, req.status, req.response );
             } else {
-                console.log ( "A5" );
                 fail ( 3, req.status, req.response );
             }
         };
@@ -377,6 +522,42 @@ var CordovaVideoteca = {
         xhr.open ( "GET", source, true );
         xhr.responseType = "blob";
         xhr.send ();
+    },
+
+    createNewPath : function ( fileRoot, newPath, returnFunction ) {
+        console.log ( [ fileRoot, newPath ] );
+        window.resolveLocalFileSystemURL ( fileRoot, function ( rootDirEntry ) {
+            rootDirEntry.getDirectory ( newPath, { create : true }, function ( subDirEntry ) {
+                if ( returnFunction ) {
+                    returnFunction ();
+                }
+            }, function ( e ) {
+                console.error ( e );
+                if ( returnFunction ) {
+                    returnFunction ();
+                }
+            } );
+        }, function ( e ) {
+            console.error ( e );
+            if ( returnFunction ) {
+                returnFunction ();
+            }
+        } );
+    },
+
+    fullscreenOn  : function ( successCallback, errorCallback ) {
+        if ( cordova.platformId == "android" ) {
+            exec ( successCallback, errorCallback, 'Videoteca', 'fullscreenOn', [] );
+        }
+
+        StatusBar.hide ();
+    },
+    fullscreenOff : function ( successCallback, errorCallback ) {
+        if ( cordova.platformId == "android" ) {
+            exec ( successCallback, errorCallback, 'Videoteca', 'fullscreenOff', [] );
+        }
+
+        StatusBar.show ();
     }
 };
 
