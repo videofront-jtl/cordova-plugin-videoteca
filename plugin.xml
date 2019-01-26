@@ -48,11 +48,6 @@
 
         <header-file src="src/ios/Videoteca.h" />
         <source-file src="src/ios/Videoteca.m" />
-        <!--<header-file src="src/ios/LandscapeVideo.h" />-->
-        <!--<source-file src="src/ios/LandscapeVideo.m" />-->
-        <!--<header-file src="src/ios/PortraitVideo.h" />-->
-        <!--<source-file src="src/ios/PortraitVideo.m" />-->
-        <!--<framework src="MediaPlayer.framework" />-->
 
         <header-file src="src/ios/APPBackgroundMode.h" />
         <source-file src="src/ios/APPBackgroundMode.m" />

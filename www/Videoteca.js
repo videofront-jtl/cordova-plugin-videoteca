@@ -77,21 +77,21 @@ var CordovaVideoteca = {
         } );
 
         if ( !document.getElementById ( "videofront_videoplayer" ) ) {
-            var divVideofront       = document.createElement ( 'div' );
-            divVideofront.id        = "videofront_videoplayer";
-            divVideofront.className = "flowplayer is-closeable";
-            document.body.appendChild ( divVideofront );
+            CordovaVideoteca._playerElement           = document.createElement ( 'div' );
+            CordovaVideoteca._playerElement.id        = "videofront_videoplayer";
+            CordovaVideoteca._playerElement.className = "flowplayer is-closeable";
+            document.body.appendChild ( CordovaVideoteca._playerElement );
 
-            var playerElement = document.getElementById ( "videofront_videoplayer" );
-
-            playerElement.style.position        = "fixed";
-            playerElement.style.top             = 0;
-            playerElement.style.left            = 0;
-            playerElement.style.right           = 0;
-            playerElement.style.bottom          = 0;
-            playerElement.style.zIndex          = 999999;
-            playerElement.style.backgroundColor = "#000000";
+            CordovaVideoteca._playerElement.style.position        = "fixed";
+            CordovaVideoteca._playerElement.style.top             = 0;
+            CordovaVideoteca._playerElement.style.left            = 0;
+            CordovaVideoteca._playerElement.style.right           = 0;
+            CordovaVideoteca._playerElement.style.bottom          = 0;
+            CordovaVideoteca._playerElement.style.zIndex          = 999999;
+            CordovaVideoteca._playerElement.style.backgroundColor = "#000000";
         }
+
+        document.addEventListener ( "backbutton", CordovaVideoteca.stopVideo2, true );
 
         player.loadSource2 ( function ( videoUrl, subtitle, seekTo, poster ) {
 
@@ -142,16 +142,12 @@ var CordovaVideoteca = {
                 }
 
                 document.getElementsByClassName ( "fp-unload" )[ 0 ].onclick = function () {
-                    document.body.removeChild ( divVideofront );
-                    CordovaBackground.disable ();
-                    CordovaVideoteca.fullscreenOff ();
+                    CordovaVideoteca.stopVideo2 ();
                 }
             } );
 
             CordovaVideoteca.flow_api.on ( 'finish shutdown unload', function ( e, api ) {
-                document.body.removeChild ( divVideofront );
-                CordovaBackground.disable ();
-                CordovaVideoteca.fullscreenOff ();
+                CordovaVideoteca.stopVideo2 ();
             } );
 
             var loader                = new XMLHttpRequest ();
@@ -183,8 +179,7 @@ var CordovaVideoteca = {
             if ( options.errorCallback ) {
                 options.errorCallback ();
             }
-            CordovaBackground.disable ();
-            CordovaVideoteca.fullscreenOff ();
+            CordovaVideoteca.stopVideo2 ();
         } );
     },
 
@@ -327,6 +322,17 @@ var CordovaVideoteca = {
         exec ( null, null, "Videoteca", "stopVideo" );
 
         clearInterval ( CordovaVideoteca.incrementVideoPlayer_setInterval );
+    },
+
+    stopVideo2 : function ( event ) {
+        if ( event ) {
+            event.stopImmediatePropagation ();
+        }
+        document.body.removeChild ( CordovaVideoteca._playerElement );
+        CordovaBackground.disable ();
+        CordovaVideoteca.fullscreenOff ();
+
+        document.removeEventListener ( "backbutton", CordovaVideoteca.stopVideo2 );
     },
 
     getState : function ( successCallback, errorCallback ) {
