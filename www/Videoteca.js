@@ -9,6 +9,19 @@ var CordovaVideoteca = {
     _vfplayer        : null,
     _playerElement   : null,
     _backbuttonEvent : null,
+    _errors          : [
+        "",
+        "Carregamento de vídeo abortado",
+        "Erro de rede",
+        "Vídeo não codificado corretamente",
+        "Arquivo de vídeo não encontrado",
+        "Vídeo não suportado",
+        "Skin não encontrado",
+        "Arquivo SWF não encontrado",
+        "Subtítulo não encontrado",
+        "URL RTMP inválido",
+        "Formato de vídeo não suportado. Tente instalar o Adobe Flash."
+    ],
 
     incrementVideoPlayer_setInterval : null,
 
@@ -57,7 +70,7 @@ var CordovaVideoteca = {
         }
     },
 
-    playVideo2 : function ( identifier, aluno_id, options ) {
+    playVideo : function ( identifier, aluno_id, options ) {
 
         options                 = options || {};
         options.autoplay        = options.autoplay || true;
@@ -76,7 +89,7 @@ var CordovaVideoteca = {
             aluno_id   : aluno_id
         } );
 
-        if ( !document.getElementById ( "videofront_videoplayer" ) ) {
+        if ( !CordovaVideoteca._playerElement ) {
             CordovaVideoteca._playerElement           = document.createElement ( 'div' );
             CordovaVideoteca._playerElement.id        = "videofront_videoplayer";
             CordovaVideoteca._playerElement.className = "flowplayer is-closeable";
@@ -91,7 +104,7 @@ var CordovaVideoteca = {
             CordovaVideoteca._playerElement.style.backgroundColor = "#000000";
         }
 
-        document.addEventListener ( "backbutton", CordovaVideoteca.stopVideo2, true );
+        document.addEventListener ( "backbutton", CordovaVideoteca.stopVideo, true );
 
         player.loadSource2 ( function ( videoUrl, subtitle, seekTo, poster ) {
 
@@ -113,19 +126,7 @@ var CordovaVideoteca = {
                 safety            : "",
                 fullscreen        : false,
                 native_fullscreen : false,
-                errors            : [
-                    "",
-                    "Carregamento de vídeo abortado",
-                    "Erro de rede",
-                    "Vídeo não codificado corretamente",
-                    "Arquivo de vídeo não encontrado",
-                    "Vídeo não suportado",
-                    "Skin não encontrado",
-                    "Arquivo SWF não encontrado",
-                    "Subtítulo não encontrado",
-                    "URL RTMP inválido",
-                    "Formato de vídeo não suportado. Tente instalar o Adobe Flash."
-                ],
+                errors            : CordovaVideoteca._errors,
                 clip              : {
                     sources : [ {
                         type : "application/x-mpegurl",
@@ -135,19 +136,29 @@ var CordovaVideoteca = {
             } );
 
             CordovaVideoteca.flow_api.on ( 'ready', function ( e, api ) {
-                api.play ();
+                if ( CordovaVideoteca.flow_api ) {
+                    api.play ();
 
-                if ( seekTo ) {
-                    api.seekTo ( seekTo );
-                }
+                    if ( seekTo ) {
+                        api.seekTo ( seekTo );
+                    }
 
-                document.getElementsByClassName ( "fp-unload" )[ 0 ].onclick = function () {
-                    CordovaVideoteca.stopVideo2 ();
+                    document.getElementsByClassName ( "fp-unload" )[ 0 ].onclick = function () {
+                        CordovaVideoteca.stopVideo ();
+                    }
                 }
             } );
 
+            document.getElementsByClassName ( "fp-unload" )[ 0 ].onclick = function () {
+                CordovaVideoteca.stopVideo ();
+            };
+
             CordovaVideoteca.flow_api.on ( 'finish shutdown unload', function ( e, api ) {
-                CordovaVideoteca.stopVideo2 ();
+                CordovaVideoteca.stopVideo ();
+            } );
+            CordovaVideoteca.flow_api.on ( 'error', function ( e, api, error ) {
+                navigator.notification.alert ( CordovaVideoteca._errors[ error.code ], null, "ERRO" );
+                CordovaVideoteca.stopVideo ();
             } );
 
             var loader                = new XMLHttpRequest ();
@@ -160,7 +171,9 @@ var CordovaVideoteca = {
                         label     : "Legenda pt-BR",
                         src       : subtitle
                     } ];
-                    CordovaVideoteca.flow_api.loadSubtitles ( 0 );
+                    if ( CordovaVideoteca.flow_api ) {
+                        CordovaVideoteca.flow_api.loadSubtitles ( 0 );
+                    }
                 }
                 else if ( this.readyState == 4 && this.status != 200 ) {
                     var x = document.getElementsByClassName ( "fp-cc" );
@@ -179,160 +192,30 @@ var CordovaVideoteca = {
             if ( options.errorCallback ) {
                 options.errorCallback ();
             }
-            CordovaVideoteca.stopVideo2 ();
+            CordovaVideoteca.stopVideo ();
         } );
     },
 
-    playVideo : function ( identifier, aluno_id, options ) {
-
-        options                 = options || {};
-        options.autoplay        = options.autoplay || true;
-        options.aluno           = options.aluno || {};
-        options.successCallback = options.successCallback || null;
-        options.errorCallback   = options.errorCallback || null;
-        options.seekTo          = options.seekTo || 0;
-
-        CordovaVideoteca.stopVideo ();
-
-        var player = vfplayer ( null, {
-            identifier : identifier,
-            aluno      : options.aluno,
-            aluno_id   : aluno_id
-        } );
-
-        if ( cordova.platformId == "android" ) {
-
-            options.aluno.dash = true;
-            player.loadSource2 ( function ( videoUrl, subtitle, seekTo ) {
-
-                var parameters = {
-                    user_agent  : "Mozilla/5.0 (Linux; Android " + CordovaVideoteca._appdata.platformVersion + "; AppleWebKit/537.36 (KHTML, like Gecko) " + CordovaVideoteca._appdata.appName + "/" + CordovaVideoteca._appdata.appVersionNumber + " Mobile Safari",
-                    url         : videoUrl,
-                    subtitleUrl : subtitle
-                };
-
-                var isReady = false;
-                exec (
-                    function ( message ) {
-                        console.log ( message );
-
-                        /**
-                         * { playback_state: "STATE_IDLE",      event_type: "state_changed_event" }
-                         * { playback_state: "STATE_READY",     event_type: "state_changed_event" }
-                         * { playback_state: "STATE_BUFFERING", event_type: "state_changed_event" }
-                         * { playback_state: "STATE_ENDED",     event_type: "state_changed_event" }
-                         * {                                    event_type: "start_event" }
-                         * {                                    event_type: "loading_event", loading: "true" }
-                         * {                                    event_type: "stop_event" }
-                         */
-                        if ( message.event_type == "state_changed_event" ) {
-                            if ( message.playback_state == "STATE_ENDED" ) {
-                                CordovaVideoteca.stopVideo ();
-                            } else if ( message.playback_state == "STATE_READY" ) {
-                                if ( options.seekTo && !isReady ) {
-                                    exec ( null, null, "Videoteca", "seekTo", [ options.seekTo ] );
-                                    isReady = true
-                                } else if ( seekTo && !isReady ) {
-                                    exec ( null, null, "Videoteca", "seekTo", [ seekTo ] );
-                                    isReady = true
-                                }
-                            }
-                        }
-
-                        if ( message.event_keycode == "KEYCODE_BACK" && message.event_action == "ACTION_DOWN" ) {
-                            CordovaVideoteca.stopVideo ();
-                        }
-
-                        if ( options.successCallback ) {
-                            options.successCallback ( message );
-                        }
-                    },
-                    function ( error ) {
-                        console.log ( error );
-                        /**
-                         * { error_message: null, error_type: "source", event_type: "player_error_event" }
-                         */
-
-                        if ( error.event_type == "player_error_event" ) {
-                            if ( error.error_type == "source" ) {
-                                navigator.notification.alert ( "Erro ao carregar o vídeo.\n\nTente novamente e se o problema persistir, entre em contato com nosso suporte.", null, "Erro..." );
-                                CordovaVideoteca.stopVideo ();
-                            }
-                        } else if ( options.errorCallback ) {
-                            options.errorCallback ( "Erro interno do Player!" );
-                        }
-                    }, "Videoteca", "playVideo", [ parameters ] );
-            }, options.errorCallback );
-        }
-        else if ( cordova.platformId == "ios" ) {
-            options.orientation = options.orientation || "landscape";
-
-            var isReady = false;
-            player.loadSource2 ( function ( videoUrl, subtitle, seekTo ) {
-                exec ( options.successCallback, options.errorCallback, "Videoteca", "playVideo", [ videoUrl, options ] );
-
-                if ( options.successCallback ) {
-                    options.successCallback ();
-                }
-
-                if ( options.seekTo && !isReady ) {
-                    exec ( null, null, "Videoteca", "seekTo", [ options.seekTo ] );
-                    isReady = true
-                } else if ( seekTo && !isReady ) {
-                    exec ( null, null, "Videoteca", "seekTo", [ seekTo ] );
-                    isReady = true
-                }
-
-            }, options.errorCallback );
-
-        }
-        else {
-            alert ( "Não há suporte para " + cordova.platformId );
-            return;
-        }
-
-        clearInterval ( CordovaVideoteca.incrementVideoPlayer_setInterval );
-        CordovaVideoteca.incrementVideoPlayer_setInterval = setInterval ( function () {
-            if ( player == null )
-                return;
-            CordovaVideoteca.getState ( function ( playerData ) {
-
-                console.log ( playerData );
-
-                var duration    = playerData.duration;
-                var currentTime = playerData.position;
-
-                window.dispatchEvent ( new CustomEvent ( 'videoteca-ontimeupdate', {
-                    'detail' : {
-                        identifier  : identifier,
-                        aluno_id    : aluno_id,
-                        currentTime : currentTime,
-                        duration    : duration,
-                        percentage  : (100 / duration) * currentTime
-                    }
-                } ) );
-
-            }, function ( error ) {
-                console.log ( error );
-            } )
-        }, 250 );
-    },
-
-    stopVideo : function () {
-        exec ( null, null, "Videoteca", "stopVideo" );
-
-        clearInterval ( CordovaVideoteca.incrementVideoPlayer_setInterval );
-    },
-
-    stopVideo2 : function ( event ) {
+    stopVideo : function ( event ) {
         if ( event ) {
             event.stopImmediatePropagation ();
         }
+
+        if ( CordovaVideoteca.flow_api == null ) {
+            return;
+        } else {
+            CordovaVideoteca.flow_api.stop ();
+        }
+
         document.body.removeChild ( CordovaVideoteca._playerElement );
+
+        CordovaVideoteca.flow_api       = null;
+        CordovaVideoteca._playerElement = null;
+
         CordovaBackground.disable ();
         CordovaVideoteca.fullscreenOff ();
 
-        document.removeEventListener ( "backbutton", CordovaVideoteca.stopVideo2 );
+        document.removeEventListener ( "backbutton", CordovaVideoteca.stopVideo );
     },
 
     getState : function ( successCallback, errorCallback ) {

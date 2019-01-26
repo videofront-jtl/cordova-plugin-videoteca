@@ -1,6 +1,6 @@
 {
     "name": "cordova-plugin-videoteca",
-    "version": "2.1.9",
+    "version": "2.1.10",
     "description": "Cordova Videoteca Plugin",
     "cordova": {
         "id": "cordova-plugin-videoteca",
