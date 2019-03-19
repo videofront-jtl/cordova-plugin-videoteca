@@ -38,10 +38,20 @@ function proccessReplace ( URL_VIDEOTECA ) {
             URL_VIDEOTECA );
     }
     if ( directoryExists ( "platforms/android" ) ) {
-        replaceUrl ( "platforms/android/platform_www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
-            URL_VIDEOTECA );
-        replaceUrl ( "platforms/android/assets/www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
-            URL_VIDEOTECA );
+
+        // Cordova Android 7
+        if ( directoryExists ( "platforms/android/app/src/main/assets/www/plugins/cordova-plugin-videoteca/www" ) ) {
+            replaceUrl ( "platforms/android/app/src/main/assets/www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
+                URL_VIDEOTECA );
+            replaceUrl ( "platforms/android/app/src/main/assets/www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
+                URL_VIDEOTECA );
+        }else {
+
+            replaceUrl ( "platforms/android/platform_www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
+                URL_VIDEOTECA );
+            replaceUrl ( "platforms/android/assets/www/plugins/cordova-plugin-videoteca/www/Videoteca.js",
+                URL_VIDEOTECA );
+        }
     }
     if ( directoryExists ( "platforms/browser" ) ) {
         replaceUrl ( "platforms/browser/www/plugins/cordova-plugin-videoteca/www/Videoteca.js",

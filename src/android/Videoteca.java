@@ -8,6 +8,10 @@ import android.provider.Settings;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.eduardokraus.videoteca.exoplayer.CallbackResponse;
+import com.eduardokraus.videoteca.exoplayer.Configuration;
+import com.eduardokraus.videoteca.exoplayer.Player;
+import com.eduardokraus.videoteca.exoplayer.Plugin;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,7 +29,13 @@ public class Videoteca extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         this.callbackContext = callbackContext;
 
-        if (action.equals("fullscreenOn")) {
+        if (action.equals("playVideo")) {
+            return playVideo(args);
+        } else if (action.equals("seekTo")) {
+            return seekTo(args);
+        } else if (action.equals("getState")) {
+            return getState();
+        } else if (action.equals("fullscreenOn")) {
             return fullscreenOn();
         } else if (action.equals("fullscreenOff")) {
             return fullscreenOff();
@@ -72,7 +82,61 @@ public class Videoteca extends CordovaPlugin {
         }
     }
 
+    private boolean playVideo(JSONArray data) {
+        try {
+            if (Plugin.player != null) {
+                Plugin.player.close();
+                // new CallbackResponse(callbackContext).send(PluginResult.Status.OK, true);
+            }
+            Plugin.player = new Player(new Configuration(data.getJSONObject(0)), cordova.getActivity(), callbackContext);
+            cordova.getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    Plugin.player.createDialog();
+                }
+            });
 
+            new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+            return true;
+        } catch (Exception e) {
+            new CallbackResponse(callbackContext).send(PluginResult.Status.JSON_EXCEPTION, false);
+            return false;
+        }
+    }
+
+    private boolean seekTo(JSONArray data) {
+        try {
+            if (Plugin.player == null) {
+                return false;
+            }
+            final int seekTime = data.optInt(0, 0);
+            cordova.getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    Plugin.player.seekTo(seekTime);
+                }
+            });
+
+            new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+            return true;
+        } catch (Exception e) {
+            new CallbackResponse(callbackContext).send(PluginResult.Status.JSON_EXCEPTION, false);
+            return false;
+        }
+    }
+
+    private boolean getState() {
+        if (Plugin.player == null) {
+            return false;
+        }
+        cordova.getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                PluginResult result = new PluginResult(PluginResult.Status.OK, Plugin.player.getPlayerState());
+                callbackContext.sendPluginResult(result);
+            }
+        });
+
+        new CallbackResponse(callbackContext).send(PluginResult.Status.NO_RESULT, true);
+        return true;
+    }
 
     private boolean fullscreenOn() {
         cordova.getActivity().runOnUiThread(new Runnable() {
