@@ -493,16 +493,37 @@ var CordovaVideoteca = {
      * @param fileURL
      */
     addFilePlayer : function ( fileURL ) {
-        if ( fileURL.indexOf ( '.css' ) > 1 ) {
-            var link  = document.createElement ( 'link' );
-            link.rel  = "stylesheet";
-            link.href = fileURL;
-            document.head.appendChild ( link );
-        } else if ( fileURL.indexOf ( '.js' ) > 1 ) {
-            var script     = document.createElement ( 'script' );
-            script.src     = fileURL;
-            script.onerror = CordovaVideoteca._loadError;
-            document.head.appendChild ( script );
+
+        if ( location.href.indexOf ( 'http' ) === 0 ) {
+            resolveLocalFileSystemURL ( fileURL, function ( entry ) {
+                var url = "http://" + location.host + entry.toURL ().replace ( "file://", "" );
+
+                if ( fileURL.indexOf ( '.css' ) > 1 ) {
+                    var link  = document.createElement ( 'link' );
+                    link.rel  = "stylesheet";
+                    link.href = url;
+                    document.head.appendChild ( link );
+                } else if ( fileURL.indexOf ( '.js' ) > 1 ) {
+                    var script     = document.createElement ( 'script' );
+                    script.src     = url;
+                    script.onerror = CordovaVideoteca._loadError;
+                    document.head.appendChild ( script );
+                }
+            }, function ( error ) {
+                console.log ( error );
+            } )
+        } else {
+            if ( fileURL.indexOf ( '.css' ) > 1 ) {
+                var link  = document.createElement ( 'link' );
+                link.rel  = "stylesheet";
+                link.href = fileURL;
+                document.head.appendChild ( link );
+            } else if ( fileURL.indexOf ( '.js' ) > 1 ) {
+                var script     = document.createElement ( 'script' );
+                script.src     = fileURL;
+                script.onerror = CordovaVideoteca._loadError;
+                document.head.appendChild ( script );
+            }
         }
     },
 
