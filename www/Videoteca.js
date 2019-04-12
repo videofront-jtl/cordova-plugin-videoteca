@@ -415,8 +415,6 @@ var CordovaVideoteca = {
 
         CordovaVideoteca._appdata = appdata;
 
-        console.log ( CordovaVideoteca._appdata );
-
         var last =
                 "platformId=" + cordova.platformId + "&" +
                 "appName=" + CordovaVideoteca._appdata.appName + "&" +
@@ -430,26 +428,26 @@ var CordovaVideoteca = {
                 "platformIsVirtual=" + CordovaVideoteca._appdata.platformIsVirtual;
 
 
-        var localVideoteca1   = "cdvfile://localhost/persistent/videoapp.js";
-        var remoteVideotecaJs = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.js?" + last;
+        var localVideoteca1   = "cdvfile://localhost/persistent/videoapp-" + Math.random () + ".js";
+        var remoteVideotecaJs = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.js?" + last + "&v=" + Math.random ();
         CordovaVideoteca.downloadAndAdd ( localVideoteca1, remoteVideotecaJs );
 
         var localVideoteca2    = "cdvfile://localhost/persistent/videoapp.css";
-        var remoteVideotecaCss = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.css?" + last;
+        var remoteVideotecaCss = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.css?" + last + "&v=" + Math.random ();
         CordovaVideoteca.downloadAndAdd ( localVideoteca2, remoteVideotecaCss );
 
         // Arquivos VideofrontPlayer
         var localPlayer1  = "cdvfile://localhost/persistent/player.css";
-        var remotePlayer1 = CordovaVideoteca.url_videoteca + "vendor-js/player/player.css";
+        var remotePlayer1 = CordovaVideoteca.url_videoteca + "vendor-js/player/player.css?v=" + Math.random ();
         CordovaVideoteca.downloadAndAdd ( localPlayer1, remotePlayer1 );
 
-        var localPlayer2  = "cdvfile://localhost/persistent/player-mobile.js";
-        var remotePlayer2 = CordovaVideoteca.url_videoteca + "vendor-js/player/player-mobile.js";
+        var localPlayer2  = "cdvfile://localhost/persistent/player-mobile-" + Math.random () + ".js";
+        var remotePlayer2 = CordovaVideoteca.url_videoteca + "vendor-js/player/player-mobile.js?v=" + Math.random ();
         CordovaVideoteca.downloadAndAdd ( localPlayer2, remotePlayer2 );
 
-        var localPlayer3  = "cdvfile://localhost/persistent/player-analytics.js";
-        var remotePlayer3 = CordovaVideoteca.url_videoteca + "api/Videos/analytics.js";
-        CordovaVideoteca.downloadAndAdd ( localPlayer3, remotePlayer3 );
+        // var localPlayer3  = "cdvfile://localhost/persistent/player-analytics.js";
+        // var remotePlayer3 = CordovaVideoteca.url_videoteca + "api/Videos/analytics.js?v=" + Math.random ();
+        // CordovaVideoteca.downloadAndAdd ( localPlayer3, remotePlayer3 );
 
         CordovaVideoteca.createNewPath ( "cdvfile://localhost/persistent/", "icons", function () {
             var localPlayer4  = "cdvfile://localhost/persistent/icons/player.woff2";
