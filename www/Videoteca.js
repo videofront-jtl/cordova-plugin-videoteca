@@ -187,12 +187,11 @@ var CordovaVideoteca = {
                     if ( message.playback_state == "STATE_ENDED" ) {
                         CordovaVideoteca.stopVideo ();
                     } else if ( message.playback_state == "STATE_READY" ) {
+                        isReady = true;
                         if ( options.seekTo && !isReady ) {
                             exec ( null, null, "Videoteca", "seekTo", [ options.seekTo ] );
-                            isReady = true
                         } else if ( seekTo && !isReady ) {
                             exec ( null, null, "Videoteca", "seekTo", [ seekTo ] );
-                            isReady = true
                         }
                     }
                 }
@@ -428,7 +427,7 @@ var CordovaVideoteca = {
                 "platformIsVirtual=" + CordovaVideoteca._appdata.platformIsVirtual;
 
 
-        var localVideoteca1   = "cdvfile://localhost/persistent/videoapp-" + Math.random () + ".js";
+        var localVideoteca1   = "cdvfile://localhost/persistent/videoapp.js";
         var remoteVideotecaJs = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.js?" + last + "&v=" + Math.random ();
         CordovaVideoteca.downloadAndAdd ( localVideoteca1, remoteVideotecaJs );
 
@@ -441,7 +440,7 @@ var CordovaVideoteca = {
         var remotePlayer1 = CordovaVideoteca.url_videoteca + "vendor-js/player/player.css?v=" + Math.random ();
         CordovaVideoteca.downloadAndAdd ( localPlayer1, remotePlayer1 );
 
-        var localPlayer2  = "cdvfile://localhost/persistent/player-mobile-" + Math.random () + ".js";
+        var localPlayer2  = "cdvfile://localhost/persistent/player-mobile.js";
         var remotePlayer2 = CordovaVideoteca.url_videoteca + "vendor-js/player/player-mobile.js?v=" + Math.random ();
         CordovaVideoteca.downloadAndAdd ( localPlayer2, remotePlayer2 );
 
@@ -589,6 +588,9 @@ var CordovaVideoteca = {
             if ( (req.status === 200 || req.status === 0) && req.response ) {
                 window.resolveLocalFileSystemURL ( getParentPath ( target ), function ( dir ) {
                     dir.getFile ( getFileName ( target ), { create : true, exclusive : false }, function ( entry ) {
+
+                        entry.delete();
+
                         entry.createWriter ( function ( fileWriter ) {
                             fileWriter.onwriteend = function ( evt ) {
                                 if ( !evt.target.error ) {
