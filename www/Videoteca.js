@@ -588,9 +588,6 @@ var CordovaVideoteca = {
             if ( (req.status === 200 || req.status === 0) && req.response ) {
                 window.resolveLocalFileSystemURL ( getParentPath ( target ), function ( dir ) {
                     dir.getFile ( getFileName ( target ), { create : true, exclusive : false }, function ( entry ) {
-
-                        entry.delete();
-
                         entry.createWriter ( function ( fileWriter ) {
                             fileWriter.onwriteend = function ( evt ) {
                                 if ( !evt.target.error ) {
