@@ -21,8 +21,6 @@ var CordovaVideoteca = {
     ],
 
     _vfplayer           : null,
-    _vfplayer2_api      : null,
-    _vfplayer2_element  : null,
     _vfplayer2_interval : null,
 
     /**
@@ -118,10 +116,6 @@ var CordovaVideoteca = {
 
         options.identifier = identifier;
         options.aluno_id   = aluno_id;
-
-        if ( CordovaVideoteca._vfplayer2_api != null ) {
-            CordovaVideoteca._vfplayer2_api.stop ()
-        }
 
         //
         var player = vfplayer ( null, {
@@ -259,109 +253,15 @@ var CordovaVideoteca = {
      * @param _video
      */
     playVideo_ios : function ( options, videoUrl, subtitle, seekTo, _video ) {
-        if ( !CordovaVideoteca._vfplayer2_element ) {
-            CordovaVideoteca._vfplayer2_element           = document.createElement ( 'div' );
-            CordovaVideoteca._vfplayer2_element.id        = "videofront_videoplayer";
-            CordovaVideoteca._vfplayer2_element.className = "flowplayer is-closeable";
-            document.body.appendChild ( CordovaVideoteca._vfplayer2_element );
-
-            CordovaVideoteca._vfplayer2_element.style.position        = "fixed";
-            CordovaVideoteca._vfplayer2_element.style.top             = 0;
-            CordovaVideoteca._vfplayer2_element.style.left            = 0;
-            CordovaVideoteca._vfplayer2_element.style.right           = 0;
-            CordovaVideoteca._vfplayer2_element.style.bottom          = 0;
-            CordovaVideoteca._vfplayer2_element.style.zIndex          = 999999;
-            CordovaVideoteca._vfplayer2_element.style.backgroundColor = "#000000";
-        }
-
-        CordovaBackground.enable ();
-        CordovaVideoteca.fullscreenOn ();
-
-        if ( options.successCallback ) {
-            options.successCallback ();
-        }
-
-        CordovaVideoteca._vfplayer2_api = vfplayer2 ( "#videofront_videoplayer", {
-            chromecast        : true,
-            autoplay          : false,
-            share             : false,
-            width             : "100%",
-            height            : "100%",
-            poster            : _video.poster,
-            speeds            : _video.speed.split ( "," ),
-            safety            : "",
-            fullscreen        : false,
-            native_fullscreen : false,
-            errors            : CordovaVideoteca._errors,
-            clip              : {
-                sources : [ {
-                    type : "application/x-mpegurl",
-                    src  : videoUrl
-                } ]
-            }
-        } );
-
-        CordovaVideoteca._vfplayer2_api.on ( 'ready', function ( e, api ) {
-            if ( CordovaVideoteca._vfplayer2_api ) {
-                api.play ();
-
-                if ( seekTo ) {
-                    api.seekTo ( seekTo );
-                }
-
-                document.getElementsByClassName ( "fp-unload" )[ 0 ].onclick = function () {
-                    CordovaVideoteca.stopVideo ();
-                }
-            }
-        } );
-
-        document.getElementsByClassName ( "fp-unload" )[ 0 ].onclick = function () {
-            CordovaVideoteca.stopVideo ();
-        };
-
-        CordovaVideoteca._vfplayer2_api.on ( 'finish shutdown unload', function ( e, api ) {
-            CordovaVideoteca.stopVideo ();
-        } );
-        CordovaVideoteca._vfplayer2_api.on ( 'error', function ( e, api, error ) {
-            navigator.notification.alert ( CordovaVideoteca._errors[ error.code ], null, "ERRO" );
-            CordovaVideoteca.stopVideo ();
-        } );
-        CordovaVideoteca._vfplayer2_api.on ( 'progress', function ( e, api ) {
-            window.dispatchEvent ( new CustomEvent ( 'videoteca-ontimeupdate', {
-                'detail' : {
-                    identifier  : options.identifier,
-                    aluno_id    : options.aluno_id,
-                    currentTime : api.video.time,
-                    duration    : api.video.duration,
-                    percentage  : (100 / api.video.duration) * api.video.time
-                }
-            } ) );
-        } );
-
-        // tracker
-        var loader                = new XMLHttpRequest ();
-        loader.onreadystatechange = function () {
-            if ( this.readyState == 4 && this.status == 200 ) {
-                CordovaVideoteca._vfplayer2_api.video.subtitles = [ {
-                    "default" : true,
-                    kind      : "subtitles",
-                    srclang   : "pt-BR",
-                    label     : "Legenda pt-BR",
-                    src       : subtitle
-                } ];
-                if ( CordovaVideoteca._vfplayer2_api ) {
-                    CordovaVideoteca._vfplayer2_api.loadSubtitles ( 0 );
-                }
-            }
-            else if ( this.readyState == 4 && this.status != 200 ) {
-                var x = document.getElementsByClassName ( "fp-cc" );
-                if ( x[ 0 ] ) {
-                    x[ 0 ].style.display = 'none';
-                }
-            }
-        };
-        loader.open ( 'HEAD', subtitle, true );
-        loader.send ();
+        $ ( "body" ).append (
+            '<div id="videofront_videoplayer"\n' +
+            '     style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:999998;background-color:#000000;">\n' +
+            '    <video id="videofront_video" src="' + videoUrl + '" autoplay \n' +
+            '           style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:999999;;"></video>\n' +
+            '</div>'
+        );
+        var video = document.getElementsByTagName ( 'video' )[ 0 ];
+        video.addEventListener ( 'webkitendfullscreen', CordovaVideoteca.stopVideo, false );
     },
 
     /**
@@ -371,16 +271,8 @@ var CordovaVideoteca = {
             exec ( null, null, "Videoteca", "stopVideo" );
             clearInterval ( CordovaVideoteca._vfplayer2_interval );
         } else {
-            if ( CordovaVideoteca._vfplayer2_api == null ) {
-                return;
-            } else {
-                CordovaVideoteca._vfplayer2_api.stop ();
-
-                document.body.removeChild ( CordovaVideoteca._vfplayer2_element );
-
-                CordovaVideoteca._vfplayer2_api     = null;
-                CordovaVideoteca._vfplayer2_element = null;
-            }
+            $ ( "#videofront_videoplayer video" ).remove ();
+            $ ( "#videofront_videoplayer" ).remove ();
         }
 
         if ( 'object' == typeof PlayerAnalytics ) {
@@ -443,10 +335,6 @@ var CordovaVideoteca = {
         var localPlayer2  = "cdvfile://localhost/persistent/player-mobile.js";
         var remotePlayer2 = CordovaVideoteca.url_videoteca + "vendor-js/player/player-mobile.js?v=" + Math.random ();
         CordovaVideoteca.downloadAndAdd ( localPlayer2, remotePlayer2 );
-
-        // var localPlayer3  = "cdvfile://localhost/persistent/player-analytics.js";
-        // var remotePlayer3 = CordovaVideoteca.url_videoteca + "api/Videos/analytics.js?v=" + Math.random ();
-        // CordovaVideoteca.downloadAndAdd ( localPlayer3, remotePlayer3 );
 
         CordovaVideoteca.createNewPath ( "cdvfile://localhost/persistent/", "icons", function () {
             var localPlayer4  = "cdvfile://localhost/persistent/icons/player.woff2";
