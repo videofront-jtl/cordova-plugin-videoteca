@@ -9,8 +9,9 @@
     <description>
         Plugin adiciona funcionalidade dos vídeos da Videoteca no seu app Cordova/Ionic/Phonegap
     </description>
+
     <author>Eduardo Kraus</author>
-    <repo>https://github.com/videofront/cordova-plugin-videoteca.git</repo>
+    <repo >https://github.com/videofront/cordova-plugin-videoteca</repo>
     <issue>https://github.com/videofront/cordova-plugin-videoteca/issues</issue>
 
     <engines>
@@ -21,6 +22,7 @@
     <dependency id="cordova-plugin-file-transfer" />
     <dependency id="cordova-plugin-dialogs" />
     <dependency id="cordova-plugin-statusbar" />
+    <dependency id="cordova-plugin-media" />
 
     <js-module src="www/Videoteca.js" name="CordovaVideoteca">
         <clobbers target="CordovaVideoteca" />
