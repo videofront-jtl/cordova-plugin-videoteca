@@ -32,7 +32,6 @@ NSString* const kAPPBackgroundJsNamespace = @"cordova.plugins.backgroundMode";
 NSString* const kAPPBackgroundEventActivate = @"activate";
 NSString* const kAPPBackgroundEventDeactivate = @"deactivate";
 
-
 #pragma mark -
 #pragma mark Life Cycle
 
@@ -129,8 +128,6 @@ NSString* const kAPPBackgroundEventDeactivate = @"deactivate";
         NSLog(@"BackgroundMode: On simulator apps never pause in background!");
     }
 }
-
-
 
 #pragma mark -
 #pragma mark Helper

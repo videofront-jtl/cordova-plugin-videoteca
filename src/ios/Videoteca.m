@@ -23,7 +23,6 @@
 
 }
 
-
 -(void)appdata:(CDVInvokedUrlCommand *) command {
     NSDictionary* deviceProperties = [self deviceProperties];
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:deviceProperties];

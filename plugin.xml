@@ -57,8 +57,8 @@
 
     <platform name="android">
 
-        <framework src="com.google.android.exoplayer:exoplayer:r2.2.0"/>
-        <framework src="com.squareup.picasso:picasso:2.5.2"/>
+        <!--<framework src="com.google.android.exoplayer:exoplayer:r2.2.0"/>-->
+        <!--<framework src="com.squareup.picasso:picasso:2.5.2"/>-->
 
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="Videoteca">
@@ -67,9 +67,9 @@
             <feature name="BackgroundMode">
                 <param name="android-package" value="com.eduardokraus.videoteca.BackgroundMode" />
             </feature>
-            <feature name="ExoPlayer">
-                <param name="android-package" value="com.eduardokraus.videoteca.exoplayer.Plugin"/>
-            </feature>
+            <!--<feature name="ExoPlayer">-->
+                <!--<param name="android-package" value="com.eduardokraus.videoteca.exoplayer.Plugin"/>-->
+            <!--</feature>-->
         </config-file>
 
         <config-file target="res/xml/config.xml" parent="/*">
@@ -91,7 +91,7 @@
         <source-file src="src/android/BackgroundMode.java"    target-dir="src/com/eduardokraus/videoteca" />
         <source-file src="src/android/ForegroundService.java" target-dir="src/com/eduardokraus/videoteca" />
 
-        <!-- ExoPlayer -->
+        <!-- ExoPlayer
         <source-file src="src/android/res/layout/exo_simple_player_view.xml"    target-dir="res/layout/"/>
         <source-file src="src/android/res/layout/exo_playback_control_view.xml" target-dir="res/layout/"/>
 
@@ -112,7 +112,7 @@
         <resource-file src="src/android/res/icons/drawable-mdpi/exoplayer_forward.png"   target="res/drawable-mdpi/exoplayer_forward.png" />
         <resource-file src="src/android/res/icons/drawable-xhdpi/exoplayer_forward.png"  target="res/drawable-xhdpi/exoplayer_forward.png" />
         <resource-file src="src/android/res/icons/drawable-xxhdpi/exoplayer_forward.png" target="res/drawable-xxhdpi/exoplayer_forward.png" />
-
+        -->
     </platform>
 
     <hook src="scripts/process.js" type="after_plugin_add" />

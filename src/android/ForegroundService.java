@@ -162,7 +162,6 @@ public class ForegroundService extends Service {
                     context, NOTIFICATION_ID, intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
-
             notification.setContentIntent(contentIntent);
         }
 
