@@ -132,12 +132,15 @@ var CordovaVideoteca = {
         CordovaVideoteca._appdata = appdata;
 
         var localVideoteca  = "cdvfile://localhost/persistent/videoapp.js";
-        var remoteVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-" + cordova.platformId + ".js?v=" + Math.random ();
+        var remoteVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-android.js?v=" + Math.random ();
+        if ( cordova.platformId == "ios" ) {
+            if ( device.version < 10 ) {
+                remoteVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios-olders.js?v=" + Math.random ();
+            } else {
+                remoteVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios.js?v=" + Math.random ();
+            }
+        }
         CordovaVideoteca.downloadAndAdd ( localVideoteca, remoteVideoteca );
-
-        //var remoteVideotecaJs = CordovaVideoteca.url_videoteca + "api/Videos/videoapp.js?v=" + Math.random ();
-
-        //var remotePlayer2 = CordovaVideoteca.url_videoteca + "vendor-js/player/player-mobile.js?v="+ Math.random ();
     },
 
     /**
