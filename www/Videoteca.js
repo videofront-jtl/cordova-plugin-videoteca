@@ -134,7 +134,7 @@ var CordovaVideoteca = {
         var localVideoteca  = "cdvfile://localhost/persistent/videoapp.js";
         var remoteVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-android.js?v=" + Math.random ();
         if ( cordova.platformId == "ios" ) {
-            if ( device.version < 10 ) {
+            if ( parseInt ( device.version ) < 10 ) {
                 remoteVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios-olders.js?v=" + Math.random ();
             } else {
                 remoteVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios.js?v=" + Math.random ();
