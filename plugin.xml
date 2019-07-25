@@ -11,7 +11,7 @@
     </description>
 
     <author>Eduardo Kraus</author>
-    <repo >https://github.com/videofront/cordova-plugin-videoteca</repo>
+    <repo>https://github.com/videofront/cordova-plugin-videoteca</repo>
     <issue>https://github.com/videofront/cordova-plugin-videoteca/issues</issue>
 
     <engines>
@@ -70,7 +70,7 @@
                 <param name="android-package" value="com.eduardokraus.videoteca.BackgroundMode" />
             </feature>
             <!--<feature name="ExoPlayer">-->
-                <!--<param name="android-package" value="com.eduardokraus.videoteca.exoplayer.Plugin"/>-->
+            <!--<param name="android-package" value="com.eduardokraus.videoteca.exoplayer.Plugin"/>-->
             <!--</feature>-->
         </config-file>
 
@@ -90,7 +90,7 @@
         <source-file src="src/android/Videoteca.java" target-dir="src/com/eduardokraus/videoteca" />
 
         <!-- BackgroundMode -->
-        <source-file src="src/android/BackgroundMode.java"    target-dir="src/com/eduardokraus/videoteca" />
+        <source-file src="src/android/BackgroundMode.java" target-dir="src/com/eduardokraus/videoteca" />
         <source-file src="src/android/ForegroundService.java" target-dir="src/com/eduardokraus/videoteca" />
 
         <!-- ExoPlayer

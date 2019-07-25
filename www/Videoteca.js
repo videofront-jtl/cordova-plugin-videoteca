@@ -175,10 +175,21 @@ var CordovaVideoteca = {
      */
     addFilePlayer : function ( fileURL ) {
 
-        if ( location.href.indexOf ( 'http' ) === 0 ) {
-            resolveLocalFileSystemURL ( fileURL, function ( entry ) {
-                var url = "http://" + location.host + entry.toURL ().replace ( "file://", "" );
+        //if ( location.href.indexOf ( 'http' ) === 0 ) {
+        //    resolveLocalFileSystemURL ( fileURL, function ( entry ) {
+        //        var url        = "http://" + location.host + entry.toURL ().replace ( "file://", "" );
+        //        var script     = document.createElement ( 'script' );
+        //        script.src     = url;
+        //        script.onerror = CordovaVideoteca._loadError;
+        //        document.head.appendChild ( script );
+        //    }, function ( error ) {
+        //        console.log ( error );
+        //    } );
+        //}
 
+        if (  typeof Ionic === "object" && typeof Ionic.WebView === "object" ) {
+            resolveLocalFileSystemURL ( fileURL, function ( entry ) {
+                var url        = window.Ionic.WebView.convertFileSrc ( entry.nativeURL );
                 var script     = document.createElement ( 'script' );
                 script.src     = url;
                 script.onerror = CordovaVideoteca._loadError;
