@@ -146,48 +146,137 @@ var CordovaVideoteca = {
     /**
      * @param localFile
      * @param remoteFile
-     * @param returnFunction
      */
-    downloadAndAdd : function ( localFile, remoteFile, returnFunction ) {
-
-        var cacheTransfer = new FileTransfer ();
-        cacheTransfer.download (
+    downloadAndAdd : function ( localFile, remoteFile ) {
+        CordovaVideoteca.download (
             encodeURI ( remoteFile ),
             localFile,
             function ( entry ) {
                 CordovaVideoteca.addFilePlayer ( localFile );
-                if ( returnFunction ) {
-                    returnFunction ();
-                }
             },
             function ( error ) {
-                CordovaVideoteca.addFilePlayer ( remoteFile );
-                if ( returnFunction ) {
-                    returnFunction ();
-                }
+                CordovaVideoteca.addFilePlayer ( localFile );
             },
             false
         );
+    },
+
+
+    /**
+     * Alterado do FileTransfer.download para este
+     *   porque o outro apaga o arquivo antes de baixar o arquivo
+     *   o que faz com que sem conexão com internet não houvesse
+     *   offline para assistir.
+     *
+     * @param source
+     * @param target
+     * @param successCallback
+     * @param errorCallback
+     */
+    download : function ( source, target, successCallback, errorCallback ) {
+        var that      = this;
+        var transfers = {};
+        var xhr       = transfers[ this._id ] = new XMLHttpRequest ();
+        var fail = errorCallback && function ( code, status, response ) {
+            if ( transfers[ that._id ] ) {
+                delete transfers[ that._id ];
+            }
+            if ( response instanceof Blob ) {
+                var reader = new FileReader ();
+                reader.readAsText ( response );
+                reader.onloadend = function ( e ) {
+                    var error = {
+                        code     : code,
+                        source   : source,
+                        target   : target,
+                        status   : status,
+                        response : e.target.result
+                    };
+                    errorCallback ( error );
+                };
+            } else {
+                var error = {
+                    code     : code,
+                    source   : source,
+                    target   : target,
+                    status   : status,
+                    response : response
+                };
+                errorCallback ( error );
+            }
+        };
+
+        xhr.onload = function ( e ) {
+
+            var fileNotFound = function () {
+                fail ( "FILE_NOT_FOUND_ERR" );
+            };
+            var getParentPath = function ( filePath ) {
+                var pos = filePath.lastIndexOf ( '/' );
+                return filePath.substring ( 0, pos + 1 );
+            };
+            var getFileName   = function ( filePath ) {
+                var pos = filePath.lastIndexOf ( '/' );
+                return filePath.substring ( pos + 1 );
+            };
+
+            var req = e.target;
+            // req.status === 0 is special case for local files with file:// URI scheme
+            if ( (req.status === 200 || req.status === 0) && req.response ) {
+                window.resolveLocalFileSystemURL ( getParentPath ( target ), function ( dir ) {
+                    dir.getFile ( getFileName ( target ), { create : true },
+                        function writeFile ( entry ) {
+                            entry.createWriter ( function ( fileWriter ) {
+                                fileWriter.onwriteend = function ( evt ) {
+                                    if ( !evt.target.error ) {
+                                        entry.filesystemName = entry.filesystem.name;
+                                        delete transfers[ that._id ];
+                                        if ( successCallback ) {
+                                            successCallback ( entry );
+                                        }
+                                    } else {
+                                        fail ( "FILE_NOT_FOUND_ERR" );
+                                    }
+                                };
+                                fileWriter.onerror    = function () {
+                                    fail ( "FILE_NOT_FOUND_ERR" );
+                                };
+                                fileWriter.write ( req.response );
+                            }, fileNotFound );
+                        }, fileNotFound );
+                }, fileNotFound );
+            } else if ( req.status === 404 ) {
+                fail ( "INVALID_URL_ERR", req.status, req.response );
+            } else {
+                fail ( "CONNECTION_ERR", req.status, req.response );
+            }
+        };
+
+        xhr.onprogress = function ( e ) {
+            if ( that.onprogress ) {
+                that.onprogress ( e );
+            }
+        };
+
+        xhr.onerror = function () {
+            fail ( "CONNECTION_ERR", this.status, this.response );
+        };
+
+        xhr.onabort = function () {
+            fail ( "ABORT_ERR", this.status, this.response );
+        };
+
+        xhr.open ( "GET", source, true );
+        xhr.responseType = "blob";
+
+        xhr.send ();
     },
 
     /**
      * @param fileURL
      */
     addFilePlayer : function ( fileURL ) {
-
-        //if ( location.href.indexOf ( 'http' ) === 0 ) {
-        //    resolveLocalFileSystemURL ( fileURL, function ( entry ) {
-        //        var url        = "http://" + location.host + entry.toURL ().replace ( "file://", "" );
-        //        var script     = document.createElement ( 'script' );
-        //        script.src     = url;
-        //        script.onerror = CordovaVideoteca._loadError;
-        //        document.head.appendChild ( script );
-        //    }, function ( error ) {
-        //        console.log ( error );
-        //    } );
-        //}
-
-        if (  typeof Ionic === "object" && typeof Ionic.WebView === "object" ) {
+        if ( typeof Ionic === "object" && typeof Ionic.WebView === "object" ) {
             resolveLocalFileSystemURL ( fileURL, function ( entry ) {
                 var url        = window.Ionic.WebView.convertFileSrc ( entry.nativeURL );
                 var script     = document.createElement ( 'script' );
