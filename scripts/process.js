@@ -23,7 +23,7 @@ if ( res && res[ 1 ] ) {
 
         console.log ( "    Para instalação é necessário o parâmetro URL_VIDEOTECA" );
         console.log ( "    Execute:" );
-        console.log ( "        cordova plugin add https://github.com/videofront/cordova-plugin-videoteca --variable URL_VIDEOTECA=\"https://SUAVIDEOTECA.videofront.com.br/\"" );
+        console.log ( "        cordova plugin add https://github.com/videofront/cordova-plugin-videoteca --variable URL_VIDEOTECA=\"https://SUAVIDEOTECA.videotecaead.com.br/\"" );
 
         console.log ( "\n\n" );
         Premisse.reject ( "Erro" );
