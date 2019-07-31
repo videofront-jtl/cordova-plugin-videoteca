@@ -131,16 +131,21 @@ var CordovaVideoteca = {
 
         CordovaVideoteca._appdata = appdata;
 
-        var localVideoteca  = "cdvfile://localhost/persistent/videoapp.js";
-        var remoteVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-android.js?v=" + Math.random ();
+        var localJsVideoteca  = "cdvfile://localhost/persistent/videoapp.js";
+        var remoteJsVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-android.js?v=" + Math.random ();
         if ( cordova.platformId == "ios" ) {
             if ( parseInt ( appdata.platformVersion ) < 10 ) {
-                remoteVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios-olders.js?v=" + Math.random ();
+                remoteJsVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios-olders.js?v=" + Math.random ();
             } else {
-                remoteVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios.js?v=" + Math.random ();
+                remoteJsVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios.js?v=" + Math.random ();
             }
         }
-        CordovaVideoteca.downloadAndAdd ( localVideoteca, remoteVideoteca );
+        CordovaVideoteca.downloadAndAdd ( localJsVideoteca, remoteJsVideoteca );
+
+        var localCssVideoteca  = "cdvfile://localhost/persistent/vfplayer3.css";
+        var remoteCssVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/vfplayer3.css?v=" + Math.random ();
+
+        CordovaVideoteca.downloadAndAdd ( localCssVideoteca, remoteCssVideoteca );
     },
 
     /**
@@ -208,7 +213,7 @@ var CordovaVideoteca = {
 
         xhr.onload = function ( e ) {
 
-            var fileNotFound = function () {
+            var fileNotFound  = function () {
                 fail ( "FILE_NOT_FOUND_ERR" );
             };
             var getParentPath = function ( filePath ) {
@@ -276,21 +281,41 @@ var CordovaVideoteca = {
      * @param fileURL
      */
     addFilePlayer : function ( fileURL ) {
-        if ( typeof Ionic === "object" && typeof Ionic.WebView === "object" ) {
-            resolveLocalFileSystemURL ( fileURL, function ( entry ) {
-                var url        = window.Ionic.WebView.convertFileSrc ( entry.nativeURL );
+
+        if ( fileURL.indexOf ( ".css" ) ) {
+            if ( typeof Ionic === "object" && typeof Ionic.WebView === "object" ) {
+                resolveLocalFileSystemURL ( fileURL, function ( entry ) {
+                    var url   = window.Ionic.WebView.convertFileSrc ( entry.nativeURL );
+                    var link  = document.createElement ( 'link' );
+                    link.rel  = "stylesheet";
+                    link.href = url;
+                    document.head.appendChild ( link );
+                }, function ( error ) {
+                    console.log ( error );
+                } );
+            } else {
+                var link  = document.createElement ( 'link' );
+                link.rel  = "stylesheet";
+                link.href = fileURL;
+                document.head.appendChild ( link );
+            }
+        } else {
+            if ( typeof Ionic === "object" && typeof Ionic.WebView === "object" ) {
+                resolveLocalFileSystemURL ( fileURL, function ( entry ) {
+                    var url        = window.Ionic.WebView.convertFileSrc ( entry.nativeURL );
+                    var script     = document.createElement ( 'script' );
+                    script.src     = url;
+                    script.onerror = CordovaVideoteca._loadError;
+                    document.head.appendChild ( script );
+                }, function ( error ) {
+                    console.log ( error );
+                } );
+            } else {
                 var script     = document.createElement ( 'script' );
-                script.src     = url;
+                script.src     = fileURL;
                 script.onerror = CordovaVideoteca._loadError;
                 document.head.appendChild ( script );
-            }, function ( error ) {
-                console.log ( error );
-            } );
-        } else {
-            var script     = document.createElement ( 'script' );
-            script.src     = fileURL;
-            script.onerror = CordovaVideoteca._loadError;
-            document.head.appendChild ( script );
+            }
         }
     },
 
