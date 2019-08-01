@@ -282,12 +282,13 @@ var CordovaVideoteca = {
      */
     addFilePlayer : function ( fileURL ) {
 
-        if ( fileURL.indexOf ( ".css" ) ) {
+        if ( fileURL.indexOf ( ".css" ) > 1 ) {
             if ( typeof Ionic === "object" && typeof Ionic.WebView === "object" ) {
                 resolveLocalFileSystemURL ( fileURL, function ( entry ) {
                     var url   = window.Ionic.WebView.convertFileSrc ( entry.nativeURL );
                     var link  = document.createElement ( 'link' );
                     link.rel  = "stylesheet";
+                    link.id   = "VfPlayer3_css";
                     link.href = url;
                     document.head.appendChild ( link );
                 }, function ( error ) {
@@ -296,6 +297,7 @@ var CordovaVideoteca = {
             } else {
                 var link  = document.createElement ( 'link' );
                 link.rel  = "stylesheet";
+                link.id   = "VfPlayer3_css";
                 link.href = fileURL;
                 document.head.appendChild ( link );
             }
