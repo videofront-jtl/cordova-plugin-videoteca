@@ -19,32 +19,21 @@ cordova plugin add https://github.com/videofront/cordova-plugin-videoteca/ --var
 </plugin>
 ```
 
-## Uso Simples
+## Opções
 
 ```javascript
 var aluno_id = 123456;
-CordovaVideoteca.playVideo ( 'VIDEO_IDENTIFIER_DA_VIDEOTECA', aluno_id );
-```
-
-## Opções avaçadas
-
-```javascript
 var options = {
-    aluno           : {
-        matricula : 123456,
-        nome      : "Eduardo Kraus",
-        email     : "kraus(A)eduardokraus.com",
-        outro     : 'dado'
-    },
-    autoplay        : true,
-    speeds          : [ 0.75, 1, 1.5, 2 ],
+    matricula       : aluno_id,
+    aluno_nome      : "Eduardo Kraus",
+    aluno_email     : "kraus(A)eduardokraus.com",
+    safety          : "123.123.123-11", // CPF do aluno para sobrepor o player
     successCallback : function () {
+        console.log( "OK" );
     },
     errorCallback   : function ( errMsg ) {
-        console.log( errMsg );
-    },
-    orientation     : 'landscape' // usado apenas no IOS
+        console.error( errMsg );
+    }
 };
-var aluno_id = 123456;
 CordovaVideoteca.playVideo ( 'VIDEO_IDENTIFIER_DA_VIDEOTECA', aluno_id, options );
 ```
