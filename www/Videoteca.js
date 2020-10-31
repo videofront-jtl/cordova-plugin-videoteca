@@ -1,10 +1,20 @@
-"use strict";
-
 var exec = require ( 'cordova/exec' );
 
 var CordovaVideoteca = {
     url_videoteca : "{URL_VIDEOTECA}",
 
+    /**
+     * Possui os seguintes dados do APP:
+     * - appName
+     * - appPackageName
+     * - appVersionNumber
+     * - platformUUID
+     * - platformVersion
+     * - platformName
+     * - platformModel
+     * - platformManufacturer
+     * - platformIsVirtual
+     */
     _appdata : {},
 
     /**
@@ -104,6 +114,13 @@ var CordovaVideoteca = {
     },
 
     /**
+     * Interrompe o vídeo e destroy o player e recria novamente o player
+     */
+    reloadPlayer : function () {
+    },
+
+    /**
+     * Interrompe o vídeo e destroy o player
      */
     stopVideo : function () {
     },
@@ -124,10 +141,12 @@ var CordovaVideoteca = {
     },
 
     init_load : function ( appdata ) {
-        appdata               = appdata || {};
-        appdata.appName       = appdata.appName || '';
-        appdata.packageName   = appdata.packageName || '';
-        appdata.versionNumber = appdata.versionNumber || '';
+        appdata = appdata || {
+            appName          : '',
+            platformVersion  : '',
+            appPackageName   : '',
+            appVersionNumber : '',
+        };
 
         CordovaVideoteca._appdata = appdata;
 
@@ -323,50 +342,6 @@ var CordovaVideoteca = {
 
     _loadError : function () {
         CordovaVideoteca.hasStarted = false;
-    },
-
-    /**
-     * @param tagName
-     * @param element
-     * @param idName
-     * @returns {HTMLElement}
-     * @private
-     */
-    _createElement : function ( tagName, element, idName ) {
-        var tag = document.createElement ( tagName );
-        if ( idName ) {
-            tag.id = idName;
-        }
-
-        element.appendChild ( tag );
-
-        return tag;
-    },
-
-    /**
-     * @param fileRoot
-     * @param newPath
-     * @param returnFunction
-     */
-    createNewPath : function ( fileRoot, newPath, returnFunction ) {
-        console.log ( [ fileRoot, newPath ] );
-        window.resolveLocalFileSystemURL ( fileRoot, function ( rootDirEntry ) {
-            rootDirEntry.getDirectory ( newPath, { create : true }, function ( subDirEntry ) {
-                if ( returnFunction ) {
-                    returnFunction ();
-                }
-            }, function ( e ) {
-                console.error ( e );
-                if ( returnFunction ) {
-                    returnFunction ();
-                }
-            } );
-        }, function ( e ) {
-            console.error ( e );
-            if ( returnFunction ) {
-                returnFunction ();
-            }
-        } );
     },
 
     /**
