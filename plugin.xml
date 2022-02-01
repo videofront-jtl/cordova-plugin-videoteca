@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-videoteca"
-        version="2.2.0">
+        version="2.2.1">
 
     <name>cordova-plugin-videoteca</name>
 
@@ -15,7 +15,8 @@
     <issue>https://github.com/videofront/cordova-plugin-videoteca/issues</issue>
 
     <engines>
-        <engine name="cordova" version=">=4.0.0" />
+        <engine name="cordova" version=">=7.0.0" />
+        <engine name="ios" version=">=7.0.0" />
     </engines>
 
     <dependency id="cordova-plugin-file" />
@@ -27,95 +28,39 @@
     <js-module src="www/Videoteca.js" name="CordovaVideoteca">
         <clobbers target="CordovaVideoteca" />
     </js-module>
-    <js-module src="www/Background.js" name="CordovaBackground">
-        <clobbers target="CordovaBackground" />
-    </js-module>
-    
+
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="Videoteca">
                 <param name="ios-package" value="Videoteca" />
             </feature>
-            <feature name="BackgroundMode">
-                <param name="ios-package" value="APPBackgroundMode" onload="true" />
-                <param name="onload" value="true" />
-            </feature>
-        </config-file>
-
-        <config-file target="*-Info.plist" parent="UIBackgroundModes">
-            <array>
-                <string>audio</string>
-                <string>fetch</string>
-            </array>
         </config-file>
 
         <header-file src="src/ios/Videoteca.h" />
         <source-file src="src/ios/Videoteca.m" />
 
-        <header-file src="src/ios/APPBackgroundMode.h" />
-        <source-file src="src/ios/APPBackgroundMode.m" />
         <header-file src="src/ios/APPMethodMagic.h" />
         <source-file src="src/ios/APPMethodMagic.m" />
     </platform>
 
     <platform name="android">
 
-        <!--<framework src="com.google.android.exoplayer:exoplayer:r2.2.0"/>-->
-        <!--<framework src="com.squareup.picasso:picasso:2.5.2"/>-->
-
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="Videoteca">
                 <param name="android-package" value="com.eduardokraus.videoteca.Videoteca" />
             </feature>
-            <feature name="BackgroundMode">
-                <param name="android-package" value="com.eduardokraus.videoteca.BackgroundMode" />
-            </feature>
-            <!--<feature name="ExoPlayer">-->
-            <!--<param name="android-package" value="com.eduardokraus.videoteca.exoplayer.Plugin"/>-->
-            <!--</feature>-->
         </config-file>
 
         <config-file target="res/xml/config.xml" parent="/*">
             <preference name="KeepRunning" value="true" />
         </config-file>
 
-        <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <service android:name="com.eduardokraus.videoteca.ForegroundService" />
-        </config-file>
-
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.WAKE_LOCK" />
         </config-file>
 
-        <!-- Videoteca -->
         <source-file src="src/android/Videoteca.java" target-dir="src/com/eduardokraus/videoteca" />
 
-        <!-- BackgroundMode -->
-        <source-file src="src/android/BackgroundMode.java" target-dir="src/com/eduardokraus/videoteca" />
-        <source-file src="src/android/ForegroundService.java" target-dir="src/com/eduardokraus/videoteca" />
-
-        <!-- ExoPlayer
-        <source-file src="src/android/res/layout/exo_simple_player_view.xml"    target-dir="res/layout/"/>
-        <source-file src="src/android/res/layout/exo_playback_control_view.xml" target-dir="res/layout/"/>
-
-        <source-file src="src/android/player/CallbackResponse.java"     target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/Configuration.java"        target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/LayoutProvider.java"       target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/Payload.java"              target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/Player.java"               target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/Plugin.java"               target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-        <source-file src="src/android/player/SpeedActivity.java"        target-dir="src/com/eduardokraus/videoteca/exoplayer/"/>
-
-        <resource-file src="src/android/res/icons/drawable-hdpi/exoplayer_back.png"      target="res/drawable-hdpi/exoplayer_back.png" />
-        <resource-file src="src/android/res/icons/drawable-mdpi/exoplayer_back.png"      target="res/drawable-mdpi/exoplayer_back.png" />
-        <resource-file src="src/android/res/icons/drawable-xhdpi/exoplayer_back.png"     target="res/drawable-xhdpi/exoplayer_back.png" />
-        <resource-file src="src/android/res/icons/drawable-xxhdpi/exoplayer_back.png"    target="res/drawable-xxhdpi/exoplayer_back.png" />
-
-        <resource-file src="src/android/res/icons/drawable-hdpi/exoplayer_forward.png"   target="res/drawable-hdpi/exoplayer_forward.png" />
-        <resource-file src="src/android/res/icons/drawable-mdpi/exoplayer_forward.png"   target="res/drawable-mdpi/exoplayer_forward.png" />
-        <resource-file src="src/android/res/icons/drawable-xhdpi/exoplayer_forward.png"  target="res/drawable-xhdpi/exoplayer_forward.png" />
-        <resource-file src="src/android/res/icons/drawable-xxhdpi/exoplayer_forward.png" target="res/drawable-xxhdpi/exoplayer_forward.png" />
-        -->
     </platform>
 
     <hook src="scripts/process.js" type="after_plugin_add" />
