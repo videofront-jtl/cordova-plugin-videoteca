@@ -126,9 +126,12 @@ var CordovaVideoteca = {
     },
 
     hasStarted : false,
-    init       : function () {
-        if ( CordovaVideoteca.hasStarted )
+    init       : function ( url_videoteca ) {
+        if ( CordovaVideoteca.hasStarted ) {
             return;
+        }
+
+        CordovaVideoteca.url_videoteca = url_videoteca;
 
         if ( CordovaVideoteca.url_videoteca.indexOf ( "https" ) === -1 ) {
             alert ( "Parece que não configurou o Plugin cordova-plugin-videoteca!\nVerifique ou Entre em contato com suporte!" );
@@ -150,21 +153,23 @@ var CordovaVideoteca = {
 
         CordovaVideoteca._appdata = appdata;
 
-        var localJsVideoteca  = "cdvfile://localhost/persistent/videoapp.js";
-        var remoteJsVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-android.js?v=" + Math.random ();
-        if ( cordova.platformId == "ios" ) {
-            if ( parseInt ( appdata.platformVersion ) < 10 ) {
-                remoteJsVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios-olders.js?v=" + Math.random ();
-            } else {
-                remoteJsVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios.js?v=" + Math.random ();
+        window.requestFileSystem ( window.PERSISTENT, 2 * 1024 * 1024, function ( fs ) {
+            var localJsVideoteca  = fs.root.nativeURL + "/videoapp.js";
+            var remoteJsVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-android.js?v=" + Math.random ();
+            if ( cordova.platformId == "ios" ) {
+                if ( parseInt ( appdata.platformVersion ) < 10 ) {
+                    remoteJsVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios-olders.js?v=" + Math.random ();
+                } else {
+                    remoteJsVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/player-app-ios.js?v=" + Math.random ();
+                }
             }
-        }
-        CordovaVideoteca.downloadAndAdd ( localJsVideoteca, remoteJsVideoteca );
+            CordovaVideoteca.downloadAndAdd ( localJsVideoteca, remoteJsVideoteca );
 
-        var localCssVideoteca  = "cdvfile://localhost/persistent/vfplayer3.css";
-        var remoteCssVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/vfplayer3.css?v=" + Math.random ();
+            var localCssVideoteca  = fs.root.nativeURL + "/vfplayer3.css";
+            var remoteCssVideoteca = CordovaVideoteca.url_videoteca + "vendor-js/player-v3/vfplayer3.css?v=" + Math.random ();
 
-        CordovaVideoteca.downloadAndAdd ( localCssVideoteca, remoteCssVideoteca );
+            CordovaVideoteca.downloadAndAdd ( localCssVideoteca, remoteCssVideoteca );
+        } );
     },
 
     /**
