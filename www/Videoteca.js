@@ -370,5 +370,3 @@ var CordovaVideoteca = {
 };
 
 module.exports = CordovaVideoteca;
-
-CordovaVideoteca.init ();

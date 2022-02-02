@@ -7,17 +7,19 @@ Lembre-se de alterar ``https://SUAVIDEOTECA.videotecaead.com.br/`` pela URL da s
 ### Linha de comando
 
 ```
-cordova plugin add https://github.com/videofront/cordova-plugin-videoteca/ --variable URL_VIDEOTECA="https://SUAVIDEOTECA.videotecaead.com.br/"
+cordova plugin add https://github.com/videofront/cordova-plugin-videoteca/
 ```
 
 ### Adicionando no config.xml
 
 ```xml
 <plugin name="cordova-plugin-videoteca"
-        spec="https://github.com/videofront/cordova-plugin-videoteca">
-    <param name="URL_VIDEOTECA" value="https://SUAVIDEOTECA.videotecaead.com.br/" />
-</plugin>
+        spec="https://github.com/videofront/cordova-plugin-videoteca" />
 ```
+
+### Iniciando o Plugin
+
+``CordovaVideoteca.init ( "https://SUAVIDEOTECA.videotecaead.com.br/" );``
 
 ## Opções
 
