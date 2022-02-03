@@ -14,18 +14,13 @@
     <repo>https://github.com/videofront/cordova-plugin-videoteca</repo>
     <issue>https://github.com/videofront/cordova-plugin-videoteca/issues</issue>
 
-    <engines>
-        <engine name="cordova" version=">=7.0.0" />
-        <engine name="ios" version=">=7.0.0" />
-    </engines>
-
     <dependency id="cordova-plugin-file" />
     <dependency id="cordova-plugin-file-transfer" url="https://github.com/apache/cordova-plugin-file-transfer" />
     <dependency id="cordova-plugin-dialogs" />
     <dependency id="cordova-plugin-statusbar" />
     <dependency id="cordova-plugin-media" />
 
-    <js-module src="www/Videoteca.js" name="CordovaVideoteca">
+    <js-module src="www/CordovaVideoteca.js" name="CordovaVideoteca">
         <clobbers target="CordovaVideoteca" />
     </js-module>
 

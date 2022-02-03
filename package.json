@@ -14,5 +14,8 @@
         "type" : "git",
         "url" : "https://github.com/videofront/cordova-plugin-videoteca"
     },
-    "engines" : []
+    "bugs" : {
+        "url" : "https://github.com/videofront/cordova-plugin-videoteca/issues"
+    },
+    "homepage" : "https://github.com/videofront/cordova-plugin-videoteca#readme"
 }
